@@ -22,3 +22,7 @@ logs/test-base.log
 logs/test-patched.log
 logs/options-base.json
 logs/options-patched.json
+# Local Python caches and raw paired benchmark captures
+__pycache__/
+*.pyc
+bench/results/
