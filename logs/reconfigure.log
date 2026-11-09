@@ -1,0 +1,491 @@
+The Meson build system
+Version: 1.12.1
+Source dir: /workspace/scratch/908399f6f132/mesa-gm107
+Build dir: /workspace/scratch/908399f6f132/mesa-gm107/build-headless
+Build type: native build
+Project name: mesa
+Project version: 26.2.6
+C compiler for the host machine: cc (gcc 14.2.0 "cc (Debian 14.2.0-19) 14.2.0")
+C linker for the host machine: cc ld.bfd 2.44
+C++ compiler for the host machine: c++ (gcc 14.2.0 "c++ (Debian 14.2.0-19) 14.2.0")
+C++ linker for the host machine: c++ ld.bfd 2.44
+Host machine cpu family: x86_64
+Host machine cpu: x86_64
+Checking for size of "void*" : 8 
+Checking if "-mtls-dialect=gnu2" runs: YES
+Checking if "split TLSDESC" links: YES 
+Dependency libglvnd for host machine skipped: feature glvnd disabled
+Program glslangValidator found: NO
+Dependency libva for host machine skipped: feature gallium-va disabled
+mesa-gm107/meson.build:872: WARNING: add_languages is missing native:, assuming languages are wanted for both host and build.
+Rust compiler for the host machine: rustc -C linker=cc (rustc 1.90.0 "1.90.0")
+Rust linker for the host machine:  ld.bfd 2.44
+Program bindgen found: YES (/workspace/scratch/908399f6f132/cargo/bin/bindgen)
+Program python3.16 found: NO
+Program python3.15 found: NO
+Program python3.14 found: NO
+Program python3.13 found: YES 3.13.5 3.13.5 (/usr/bin/python3.13)
+Program python3.12 found: YES 3.12.14 3.12.14 (/workspace/scratch/908399f6f132/build-tools/bin/python3.12)
+Fetching value of define "ETIME" : 62 
+Compiler for C supports arguments -gsplit-dwarf: YES 
+Compiler for C supports link arguments -Wl,--gdb-index: NO 
+Checking for function "bswap32" : YES 
+Checking for function "bswap64" : YES 
+Checking for function "clz" : YES 
+Checking for function "clzll" : YES 
+Checking for function "ctz" : YES 
+Checking for function "expect" : YES 
+Checking for function "ffs" : YES 
+Checking for function "ffsll" : YES 
+Checking for function "popcount" : YES 
+Checking for function "popcountll" : YES 
+Checking for function "unreachable" : YES 
+Checking for function "types_compatible_p" : YES 
+Checking for function "__builtin_add_overflow" : YES 
+Checking for function "__builtin_add_overflow_p" : YES 
+Checking for function "__builtin_sub_overflow_p" : YES 
+Checking for function "__builtin_arm_get_fpscr" : NO 
+Checking for function "__builtin_arm_set_fpscr" : NO 
+Checking for function "__builtin_aarch64_get_fpcr" : NO 
+Checking for function "__builtin_aarch64_set_fpcr" : NO 
+Compiler for C supports function attribute const: YES 
+Compiler for C supports function attribute flatten: YES 
+Compiler for C supports function attribute malloc: YES 
+Compiler for C supports function attribute pure: YES 
+Compiler for C supports function attribute unused: YES 
+Compiler for C supports function attribute warn_unused_result: YES 
+Compiler for C supports function attribute weak: YES 
+Compiler for C supports function attribute format: YES 
+Compiler for C supports function attribute packed: YES 
+Compiler for C supports function attribute returns_nonnull: YES 
+Compiler for C supports function attribute alias: YES 
+Compiler for C supports function attribute noreturn: YES 
+Compiler for C supports function attribute optimize: YES 
+Compiler for C supports function attribute cold: YES 
+Compiler for C supports function attribute visibility:hidden: YES 
+Checking if "__uint128_t" compiles: YES 
+Checking for function "reallocarray" : YES 
+Checking for function "fmemopen" : YES 
+Checking if "gc-sections" links: YES 
+Compiler for C supports arguments -Werror=implicit-function-declaration: YES 
+Compiler for C supports arguments -Werror=missing-prototypes: YES 
+Compiler for C supports arguments -Werror=return-type: YES 
+Compiler for C supports arguments -Werror=empty-body: YES 
+Compiler for C supports arguments -Werror=incompatible-pointer-types: YES 
+Compiler for C supports arguments -Werror=int-conversion: YES 
+Compiler for C supports arguments -Wimplicit-fallthrough: YES 
+Compiler for C supports arguments -Wmisleading-indentation: YES 
+Compiler for C supports arguments -Wno-error=maybe-uninitialized: YES 
+Compiler for C supports arguments -Wno-missing-field-initializers: YES 
+Compiler for C supports arguments -Wno-format-truncation: YES 
+Compiler for C supports arguments -Wno-nonnull-compare: YES 
+Compiler for C supports arguments -fno-math-errno: YES 
+Compiler for C supports arguments -fno-trapping-math: YES 
+Compiler for C supports arguments -Qunused-arguments: NO 
+Compiler for C supports arguments -fno-common: YES 
+Compiler for C supports arguments -Wno-unknown-pragmas: YES 
+Compiler for C supports arguments -Wno-microsoft-enum-value: NO 
+Compiler for C supports arguments -Wno-unused-function: YES 
+Compiler for C supports arguments -Werror=format: YES 
+Compiler for C supports arguments -Wformat-security: YES 
+Compiler for C supports arguments -Werror=thread-safety: NO 
+Compiler for C supports arguments -ffunction-sections: YES 
+Compiler for C supports arguments -fdata-sections: YES 
+Compiler for C++ supports arguments -Werror=return-type: YES 
+Compiler for C++ supports arguments -Werror=empty-body: YES 
+Compiler for C++ supports arguments -Wmisleading-indentation: YES 
+Compiler for C++ supports arguments -Wno-error=maybe-uninitialized: YES 
+Compiler for C++ supports arguments -Wno-non-virtual-dtor: YES 
+Compiler for C++ supports arguments -Wno-missing-field-initializers: YES 
+Compiler for C++ supports arguments -Wno-format-truncation: YES 
+Compiler for C++ supports arguments -fno-math-errno: YES 
+Compiler for C++ supports arguments -fno-trapping-math: YES 
+Compiler for C++ supports arguments -Qunused-arguments: NO 
+Compiler for C++ supports arguments -flifetime-dse=1: YES 
+Compiler for C++ supports arguments -Wno-unknown-pragmas: YES 
+Compiler for C++ supports arguments -Wno-microsoft-enum-value: NO 
+Compiler for C++ supports arguments -Werror=format: YES 
+Compiler for C++ supports arguments -Wformat-security: YES 
+Compiler for C++ supports arguments -ffunction-sections: YES 
+Compiler for C++ supports arguments -fdata-sections: YES 
+Compiler for C supports arguments -Wno-override-init: YES 
+Compiler for C supports arguments -Wno-initializer-overrides: NO 
+Compiler for C supports arguments -Werror=pointer-arith: YES 
+Compiler for C supports arguments -Werror=vla: YES 
+Compiler for C supports arguments -Werror=gnu-empty-initializer: NO 
+Compiler for C supports arguments -Wgnu-pointer-arith: NO 
+Compiler for C++ supports arguments -Werror=pointer-arith: YES 
+Compiler for C++ supports arguments -Werror=vla: YES 
+Compiler for C++ supports arguments -Werror=gnu-empty-initializer: NO 
+Compiler for C++ supports arguments -Wgnu-pointer-arith: NO 
+Compiler for C supports arguments -Werror=date-time: YES 
+Compiler for C supports arguments -Werror=gnu-alignof-expression: NO 
+Compiler for C supports arguments -Werror=ignored-qualifiers: YES 
+Compiler for C supports arguments -Werror=implicit-fallthrough: YES 
+Compiler for C supports arguments -Werror=int-conversion: YES (cached)
+Compiler for C supports arguments -Werror=missing-prototypes: YES (cached)
+Compiler for C supports arguments -Werror=pragma-pack: NO 
+Compiler for C supports arguments -Werror=pragma-pack-suspicious-include: NO 
+Compiler for C supports arguments -Werror=sizeof-array-div: YES 
+Compiler for C supports arguments -Werror=string-plus-int: NO 
+Compiler for C supports arguments -Werror=unreachable-code-loop-increment: NO 
+Compiler for C++ supports arguments -D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS: YES 
+Compiler for C++ supports arguments -Werror=date-time: YES 
+Compiler for C++ supports arguments -Werror=gnu-alignof-expression: NO 
+Compiler for C++ supports arguments -Werror=ignored-qualifiers: YES 
+Compiler for C++ supports arguments -Werror=implicit-fallthrough: YES 
+Compiler for C++ supports arguments -Werror=pragma-pack: NO 
+Compiler for C++ supports arguments -Werror=pragma-pack-suspicious-include: NO 
+Compiler for C++ supports arguments -Werror=sizeof-array-div: YES 
+Compiler for C++ supports arguments -Werror=string-plus-int: NO 
+Compiler for C++ supports arguments -Werror=unreachable-code-loop-increment: NO 
+Compiler for C++ supports arguments -Werror=missing-declarations: YES 
+Checking for function "__builtin_ia32_clflushopt" : YES 
+Checking if "GCC atomic builtins" compiles: YES 
+Checking if "GCC atomic builtins required -latomic" links: YES 
+Checking if "GCC 64bit atomics" with dependency  links: YES 
+Library ws2_32 found: NO
+Header "sys/sysmacros.h" has symbol "major" : YES 
+Header "sys/sysmacros.h" has symbol "minor" : YES 
+Header "sys/sysmacros.h" has symbol "makedev" : YES 
+Header "sys/mkdev.h" has symbol "major" : NO 
+Check usable header "sched.h" : YES 
+Checking for function "sched_getaffinity" : YES 
+Check usable header "xlocale.h" : NO 
+Check usable header "linux/futex.h" : YES 
+Check usable header "endian.h" : YES 
+Check usable header "dlfcn.h" : YES 
+Check usable header "sys/shm.h" : YES 
+Check usable header "cet.h" : YES 
+Check usable header "pthread_np.h" : NO 
+Check usable header "poll.h" : YES 
+Check usable header "sys/inotify.h" : YES 
+Check usable header "linux/udmabuf.h" : YES 
+Checking for function "strtof" : YES 
+Checking for function "mkostemp" : YES 
+Checking for function "memfd_create" : YES 
+Checking for function "random_r" : YES 
+Checking for function "flock" : YES 
+Checking for function "strtok_r" : YES 
+Checking for function "getrandom" : YES 
+Checking for function "qsort_s" : NO 
+Checking for function "posix_fallocate" : YES 
+Checking for function "secure_getenv" : YES 
+Checking for function "sysconf" : YES 
+Compiler for C++ supports arguments -fno-permissive: YES 
+Checking if "GNU qsort_r" links: YES 
+Header "time.h" has symbol "struct timespec" : YES 
+Checking for function "thrd_create" : YES 
+Header "errno.h" has symbol "program_invocation_name" : YES 
+Header "math.h" has symbol "issignaling" : YES 
+Checking for function "posix_memalign" : YES 
+Checking whether type "struct dirent" has member "d_type" : YES 
+Checking if "strtod has locale support" links: YES 
+Checking if "Bsymbolic" links: YES 
+Checking if "version-script" links: YES 
+Checking if "dynamic-list" links: YES 
+Compiler for C supports link arguments -Wl,--build-id=sha1: YES 
+Checking for function "dlopen" : YES 
+Checking for function "dladdr" with dependency : YES 
+Checking for function "dl_iterate_phdr" : YES 
+Checking for function "clock_gettime" : YES 
+Found pkg-config: YES (/usr/bin/pkg-config) 1.8.1
+Run-time dependency zlib found: YES 1.3.1
+Did not find CMake 'cmake'
+Found CMake: NO
+Run-time dependency libdisplay-info found: NO  (tried pkg-config and cmake)
+Run-time dependency libzstd found: YES 1.5.7
+Run-time dependency threads found: YES
+Checking for function "pthread_setaffinity_np" with dependency threads: YES 
+Run-time dependency expat found: YES 2.9.0
+Library m found: YES
+Run-time dependency libdrm found: NO  (tried pkg-config and cmake)
+Looking for a fallback subproject for the dependency libdrm
+
+Executing subproject libdrm for machine: host 
+
+libdrm| Project name: libdrm
+libdrm| Project version: 2.4.133
+libdrm| C compiler for the host machine: cc (gcc 14.2.0 "cc (Debian 14.2.0-19) 14.2.0")
+libdrm| C linker for the host machine: cc ld.bfd 2.44
+libdrm| Dependency threads for host machine found: YES unknown (cached)
+libdrm| Checking for function "secure_getenv" : YES
+libdrm| Program symbols-check.py found: YES (/workspace/scratch/908399f6f132/build-tools/bin/python /workspace/scratch/908399f6f132/mesa-gm107/subprojects/libdrm-2.4.133/symbols-check.py)
+libdrm| Program nm found: YES (/usr/bin/nm)
+libdrm| Program python3 found: YES (/workspace/scratch/908399f6f132/build-tools/bin/python)
+libdrm| Run-time dependency atomic_ops found: NO  (tried pkg-config and cmake)
+libdrm| Checking if "Intel Atomics" links: YES
+libdrm| Dependency pciaccess for host machine skipped: feature intel disabled
+libdrm| Checking for function "dlsym" : YES
+libdrm| Checking for function "clock_gettime" : YES
+libdrm| Check usable header "sys/select.h" : YES
+libdrm| Check usable header "alloca.h" : YES
+libdrm| Header "sys/sysmacros.h" has symbol "major" : YES (cached)
+libdrm| Header "sys/sysmacros.h" has symbol "minor" : YES (cached)
+libdrm| Header "sys/sysmacros.h" has symbol "makedev" : YES (cached)
+libdrm| Header "sys/mkdev.h" has symbol "major" : NO (cached)
+libdrm| Checking for function "open_memstream" : YES
+libdrm| Compiler for C supports arguments -Wsign-compare: YES
+libdrm| Compiler for C supports arguments -Werror=undef: YES
+libdrm| Compiler for C supports arguments -Werror=implicit-function-declaration: YES (cached)
+libdrm| Compiler for C supports arguments -Wpointer-arith: YES
+libdrm| Compiler for C supports arguments -Wwrite-strings: YES
+libdrm| Compiler for C supports arguments -Wstrict-prototypes: YES
+libdrm| Compiler for C supports arguments -Wmissing-prototypes: YES
+libdrm| Compiler for C supports arguments -Wmissing-declarations: YES
+libdrm| Compiler for C supports arguments -Wnested-externs: YES
+libdrm| Compiler for C supports arguments -Wpacked: YES
+libdrm| Compiler for C supports arguments -Wswitch-enum: YES
+libdrm| Compiler for C supports arguments -Wmissing-format-attribute: YES
+libdrm| Compiler for C supports arguments -Wstrict-aliasing=2: YES
+libdrm| Compiler for C supports arguments -Winit-self: YES
+libdrm| Compiler for C supports arguments -Winline: YES
+libdrm| Compiler for C supports arguments -Wshadow: YES
+libdrm| Compiler for C supports arguments -Wdeclaration-after-statement: YES
+libdrm| Compiler for C supports arguments -Wold-style-definition: YES
+libdrm| Compiler for C supports arguments -Wno-unused-parameter: YES
+libdrm| Compiler for C supports arguments -Wno-attributes: YES
+libdrm| Compiler for C supports arguments -Wno-long-long: YES
+libdrm| Compiler for C supports arguments -Wno-missing-field-initializers: YES (cached)
+libdrm| Run-time dependency cairo found: NO  (tried pkg-config and cmake)
+libdrm| Run-time dependency valgrind found: NO  (tried pkg-config)
+libdrm| Program rst2man rst2man.py found: NO
+libdrm| Compiler for C supports function attribute visibility:hidden: YES (cached)
+libdrm| Configuring config.h using configuration
+libdrm| Found pkg-config: YES (/usr/bin/pkg-config) 1.8.1
+libdrm| Build targets in project: 14
+libdrm| Subproject libdrm finished.
+
+Dependency libdrm for host machine found: YES 2.4.133 (overridden)
+Run-time dependency libudev found: NO  (tried pkg-config and cmake)
+llvm-config found: YES (/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/bin/llvm-config) 19.1.7
+Run-time dependency LLVM (modules: bitwriter, core, coverage, engine, executionengine, instcombine, irreader, libdriver, linker, lto, mcdisassembler, mcjit, native, option, scalaropts, target, transformutils, abi(missing but optional), all-targets, coroutines, frontenddriver, frontendhlsl, lto, windowsdriver) found: YES 19.1.7
+Run-time dependency llvmspirvlib found: YES 19.1.0.0
+Run-time dependency spirv-tools found: YES 2025.1.1
+Library clang-cpp found: YES
+Run-time dependency lua54 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua5.4 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua-5.4 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua53 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua5.3 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua-5.3 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua found: NO  (tried pkg-config and cmake)
+Run-time dependency libelf found: YES 0.192
+Dependency valgrind for host machine skipped: feature valgrind disabled
+Program bison found: NO
+Program byacc found: NO
+Program bison found: NO
+Program flex found: NO
+Program ln found: YES (/usr/bin/ln)
+Dependency libunwind for host machine skipped: feature libunwind disabled
+Run-time dependency OpenMP found: YES 4.5
+Library sensors found: NO
+Program nm found: YES (/usr/bin/nm)
+Program symbols-check.py found: YES (/workspace/scratch/908399f6f132/build-tools/bin/python /workspace/scratch/908399f6f132/mesa-gm107/bin/symbols-check.py)
+Program install_megadrivers.py found: YES (/workspace/scratch/908399f6f132/build-tools/bin/python /workspace/scratch/908399f6f132/mesa-gm107/bin/install_megadrivers.py)
+Checking for size of "void *" : 8 
+Compiler for C supports arguments -Wno-error: YES 
+Program xmllint found: NO
+Compiler for C++ supports arguments -std=c++2a: YES 
+Cleaning... 0 files.
+Compiler for C supports arguments -Wno-misleading-indentation: YES 
+Checking whether type "spvtools::LinkerOptions" has member "SetAllowPtrTypeMismatch(true)" with dependency SPIRV-Tools: YES 
+Compiler for C supports link arguments -fPIC: YES 
+Program decode.py found: YES (/workspace/scratch/908399f6f132/mesa-gm107/src/compiler/isaspec/decode.py)
+Program encode.py found: YES (/workspace/scratch/908399f6f132/mesa-gm107/src/compiler/isaspec/encode.py)
+Program bindgen found: YES (/workspace/scratch/908399f6f132/cargo/bin/bindgen)
+Compiler for C supports arguments -Wno-missing-prototypes: YES 
+mesa-gm107/src/compiler/rust/meson.build:117: WARNING: include_directories sandbox violation!
+The project is trying to access the directory '../../../build-headless' which belongs to a different
+subproject. This is a problem as it hardcodes the relative paths of these two projects.
+This makes it impossible to compile the project in any other directory layout and also
+prevents the subproject from changing its own directory layout.
+
+Instead of poking directly at the internals the subproject should be executed and
+it should set a variable that the caller can then use. Something like:
+
+# In subproject
+some_dep = declare_dependency(include_directories: include_directories('include'))
+
+# In subproject wrap file
+[provide]
+some = some_dep
+
+# In parent project
+some_dep = dependency('some')
+executable(..., dependencies: [some_dep])
+
+This warning will become a hard error in a future Meson release.
+
+Run-time dependency syn found: NO  (tried pkg-config and cmake)
+Looking for a fallback subproject for the dependency syn
+
+Executing subproject syn-2-rs for machine: host 
+
+syn-2-rs| Project name: syn
+syn-2-rs| Project version: 2.0.87
+syn-2-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.90.0 "1.90.0")
+syn-2-rs| Rust linker for the host machine:  ld.bfd 2.44
+
+Executing subproject syn-2-rs:unicode-ident-1-rs for machine: host
+
+unicode-ident-1-rs| Project name: unicode-ident
+unicode-ident-1-rs| Project version: 1.0.12
+unicode-ident-1-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.90.0 "1.90.0")
+unicode-ident-1-rs| Rust linker for the host machine:  ld.bfd 2.44
+unicode-ident-1-rs| Build targets in project: 88
+unicode-ident-1-rs| Subproject unicode-ident-1-rs finished.
+
+
+Executing subproject syn-2-rs:quote-1-rs for machine: host
+
+quote-1-rs| Project name: quote
+quote-1-rs| Project version: 1.0.35
+quote-1-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.90.0 "1.90.0")
+quote-1-rs| Rust linker for the host machine:  ld.bfd 2.44
+
+Executing subproject syn-2-rs:quote-1-rs:proc-macro2-1-rs for machine: host
+
+proc-macro2-1-rs| Project name: proc-macro2
+proc-macro2-1-rs| Project version: 1.0.86
+proc-macro2-1-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.90.0 "1.90.0")
+proc-macro2-1-rs| Rust linker for the host machine:  ld.bfd 2.44
+proc-macro2-1-rs| Build targets in project: 89
+proc-macro2-1-rs| Subproject proc-macro2-1-rs finished.
+
+quote-1-rs| Build targets in project: 90
+quote-1-rs| Subproject quote-1-rs finished.
+
+syn-2-rs| Build targets in project: 91
+syn-2-rs| Subproject syn-2-rs finished.
+
+Dependency syn for host machine from subproject subprojects/syn-2.0.87 found: YES 2.0.87
+Compiler for C supports arguments -Wno-gnu-variable-sized-type-not-at-end: NO 
+Program cbindgen found: YES 0.29.0 0.29.0 (/workspace/scratch/908399f6f132/cargo/bin/cbindgen)
+Run-time dependency paste found: NO  (tried pkg-config and cmake)
+Looking for a fallback subproject for the dependency paste
+
+Executing subproject paste-1-rs for machine: host 
+
+paste-1-rs| Project name: paste
+paste-1-rs| Project version: 1.0.14
+paste-1-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.90.0 "1.90.0")
+paste-1-rs| Rust linker for the host machine:  ld.bfd 2.44
+paste-1-rs| Build targets in project: 355
+paste-1-rs| Subproject paste-1-rs finished.
+
+Dependency paste for host machine from subproject subprojects/paste-1.0.14 found: YES 1.0.14
+Dependency paste for host machine found: YES 1.0.14 (cached)
+Run-time dependency rustc-hash found: NO  (tried pkg-config and cmake)
+Looking for a fallback subproject for the dependency rustc-hash
+
+Executing subproject rustc-hash-2-rs for machine: host 
+
+rustc-hash-2-rs| Project name: rustc_hash
+rustc-hash-2-rs| Project version: 2.1.1
+rustc-hash-2-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.90.0 "1.90.0")
+rustc-hash-2-rs| Rust linker for the host machine:  ld.bfd 2.44
+rustc-hash-2-rs| Build targets in project: 366
+rustc-hash-2-rs| Subproject rustc-hash-2-rs finished.
+
+Dependency rustc-hash for host machine from subproject subprojects/rustc-hash-2.1.1 found: YES 2.1.1
+Program sphinx-build skipped: feature html-docs disabled
+Build targets in project: 391
+NOTICE: Future-deprecated features used:
+ * 1.11.0: {'should_fail arg in test'}
+
+libdrm 2.4.133
+
+    Intel         : false
+    Radeon        : true
+    AMDGPU        : false
+    Nouveau       : true
+    vmwgfx        : true
+    OMAP          : false
+    Freedreno     : false
+    Freedreon-kgsl: false
+    Tegra         : false
+    Etnaviv       : false
+    EXYNOS        : false
+    VC4           : false
+
+mesa 26.2.6
+
+  Directories
+    prefix            : /usr/local
+    libdir            : lib/x86_64-linux-gnu
+    includedir        : include
+
+  Common C and C++ arguments
+    c_cpp_args        : -mtls-dialect=gnu2
+
+  OpenGL
+    OpenGL            : NO
+    ES1               : NO
+    ES2               : NO
+    GLVND             : NO
+
+  DRI
+    Platform          : drm
+    Driver dir        : /usr/local/lib/x86_64-linux-gnu/dri
+
+  GLX
+    Enabled           : NO
+    Provider          : None
+
+  EGL
+    Enabled           : NO
+
+  GBM
+    Enabled           : NO
+
+  Vulkan
+    Drivers           : nouveau
+    Platforms         :
+    ICD dir           : share/vulkan/icd.d
+    Intel Ray tracing : NO
+
+  Video
+    Codecs            : all_free av1dec av1enc vp9dec mpeg12dec jpegdec
+    APIs              : vulkan
+    Encoding          : YES
+
+  LLVM
+    Required          : enabled
+    Version           : 19.1.7
+
+  Gallium
+    Enabled           : NO
+
+  Perfetto
+    Enabled           : NO
+
+  Teflon (TensorFlow Lite delegate)
+    Enabled           : NO
+
+  Subprojects (for host machine)
+    libdrm            : YES
+    paste-1-rs        : YES
+    proc-macro2-1-rs  : YES (from syn-2-rs => quote-1-rs)
+    quote-1-rs        : YES (from syn-2-rs)
+    rustc-hash-2-rs   : YES
+    syn-2-rs          : YES
+    unicode-ident-1-rs: YES (from syn-2-rs)
+
+  User defined options
+    allow-fallback-for: libdrm
+    build-tests       : true
+    buildtype         : debugoptimized
+    egl               : disabled
+    gallium-drivers   : []
+    gbm               : disabled
+    gles1             : disabled
+    gles2             : disabled
+    glx               : disabled
+    libunwind         : disabled
+    opengl            : false
+    platforms         : []
+    valgrind          : disabled
+    vulkan-drivers    : nouveau
+
+Found ninja-1.13.2.git.kitware.jobserver-pipe-1 at /workspace/scratch/908399f6f132/build-tools/bin/ninja

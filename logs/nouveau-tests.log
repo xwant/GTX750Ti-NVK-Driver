@@ -1,0 +1,18 @@
+ninja: Entering directory `/workspace/scratch/908399f6f132/mesa-gm107/build-headless'
+[1/5] Generating src/git_sha1.h with a custom command
+ 1/11 nouveau - mesa:nil                     OK              0.01s   1 subtests passed
+ 2/11 nouveau - mesa:nak                     OK              0.02s   9 subtests passed
+ 3/11 nouveau - mesa:mme_builder             OK              0.03s
+ 4/11 nouveau - mesa:nvk_cmd_cache_unset     OK              0.03s
+ 5/11 nouveau - mesa:nvk_cmd_cache_disabled  OK              0.03s
+ 6/11 nouveau - mesa:nvk_cmd_cache_zero      OK              0.02s
+ 7/11 nouveau - mesa:nvk_cmd_cache_sub_block OK              0.02s
+ 8/11 nouveau - mesa:nvk_cmd_cache_one_block OK              0.02s
+ 9/11 nouveau - mesa:nvk_cmd_cache_bounded   OK              0.01s
+10/11 nouveau - mesa:nvk_mme                 OK              0.01s
+11/11 nouveau - mesa:nvk_cmd_cache_non_gm107 OK              0.01s
+
+Ok:                11  
+Fail:              0   
+
+Full log written to /workspace/scratch/908399f6f132/mesa-gm107/build-headless/meson-logs/testlog.txt

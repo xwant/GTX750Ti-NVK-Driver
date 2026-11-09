@@ -1,0 +1,17 @@
+llvm-19 1:19.1.7-3+b1
+llvm-19-dev 1:19.1.7-3+b1
+llvm-19-runtime 1:19.1.7-3+b1
+libllvm19 1:19.1.7-3+b1
+libclang-cpp19 1:19.1.7-3+b1
+libclang-cpp19-dev 1:19.1.7-3+b1
+libclang-19-dev 1:19.1.7-3+b1
+libclang-common-19-dev 1:19.1.7-3+b1
+libclang1-19 1:19.1.7-3+b1
+libllvmspirvlib-19-dev 19.1.6-1
+libllvmspirvlib19.1 19.1.6-1
+spirv-tools 2025.1~rc1-1
+libelf-dev 0.192-4
+libz3-4 4.13.3-1
+libffi8 3.4.8-2
+libedit2 3.1-20250104-1
+libxml2 2.12.7+dfsg+really2.9.14-2.1+deb13u3

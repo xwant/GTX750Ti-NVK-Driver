@@ -1,0 +1,24 @@
+# Local compilation worktrees, binaries, driver objects
+work/
+*.so
+*.so.*
+*.o
+*.a
+*.bin
+*.exe
+*.log.tmp
+# Generated benchmark binary (keep source)
+bench/vk_cache_probe
+# Local benchmark outputs
+logs/*-probe.csv
+logs/*-probe.txt
+logs/cachyos-packages.txt
+logs/cachyos-kernel.txt
+logs/configure-base.log
+logs/configure-patched.log
+logs/build-base.log
+logs/build-patched.log
+logs/test-base.log
+logs/test-patched.log
+logs/options-base.json
+logs/options-patched.json

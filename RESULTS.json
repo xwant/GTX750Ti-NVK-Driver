@@ -1,0 +1,11 @@
+{
+  "upstream_commit": "8e87a503ebd91408c88596d1b9eeb5f4c0b2088d",
+  "patch_commit": "9c7293159630de87b66779a614e314503083b1a3",
+  "branch": "experiment/gm107-command-cache",
+  "hardware_tests": "NOT RUN: no GPU",
+  "cachyos_wsi_build": "NOT RUN: host headless build only",
+  "host_nvk_sha256": "3fafe59670e97235a4ae31e32a107bdbcac18386dc1bc6bfb9ed9bccafcd2477",
+  "nouveau_tests_pass": 11,
+  "nouveau_tests_fail": 0,
+  "probe_runtime_exit": 77
+}

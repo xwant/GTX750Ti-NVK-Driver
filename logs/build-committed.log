@@ -1,0 +1,7 @@
+ninja: Entering directory `mesa-gm107/build-headless'
+[1/6] Generating src/git_sha1.h with a custom command
+[2/6] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_physical_device.c.o
+[3/6] Linking static target src/nouveau/vulkan/libnvk.a
+[4/6] Linking target src/nouveau/vulkan/test_nvk_cmd_cache
+[5/6] Linking target src/nouveau/vulkan/libvulkan_nouveau.so
+[6/6] Linking target src/nouveau/vulkan/test_nvk_mme

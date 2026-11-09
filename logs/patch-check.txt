@@ -1,0 +1,6 @@
+git diff --check: PASS
+git apply --check on pinned upstream files: PASS
+Bash syntax: PASS
+CSV analyzer known-input and invalid-value checks: PASS
+Vulkan probe compiled -Wall -Wextra -Werror: PASS
+Vulkan probe hardware execution: SKIP, no ICD/GPU, exit 77

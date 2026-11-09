@@ -1,0 +1,167 @@
+Log of Meson test suite run on 2026-11-09T17:09:08.140352
+
+Inherited environment: CAAS_PREFIX_TRANSFER_AUTH_TOKEN_FILE=/dev/shm/caas-prefix-transfer/token COLORTERM='' no_proxy=localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 PKG_CONFIG_PATH=/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu/pkgconfig:/workspace/scratch/908399f6f132/build-deps/usr/lib/pkgconfig CODEX_EXEC_SERVER_REMOTE_BASE_URL=https://codex-cloud-environments.chatgpt.com/api CODEX_FLORA_CCA_GATEWAY_RESOLUTION_HOST='' CODEX_VERSION=0.0.0 CODEX_PRIMARY_RUNTIME_ROOT=/opt/codex/runtimes/codex-primary-runtime NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/nebula-dns.crt XDG_DATA_HOME=/home/agent/.local/share XDG_CONFIG_HOME=/home/agent/.config BROWSER_USE_CHATGPT_ENVIRONMENT=production BROWSER_MANAGEMENT_SOCKET_PATH=/home/agent/.local/run/browser-management/socket BUNDLE_HTTPS_PROXY=http://127.0.0.1:42211 GH_PAGER=cat PWD=/workspace/scratch/908399f6f132 OTEL_RESOURCE_ATTRIBUTES=runtime_source=cca,cluster=applied-caas88,region=centralus,service.instance.id=3aa91d5e-c602-4f7b-a174-066afcd00a20 NPM_CONFIG_NOPROXY=localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 OPENAI_CLUSTER=applied-caas88 OTEL_TRACES_SAMPLER_ARG=0.01 CXXFLAGS=-I/workspace/scratch/908399f6f132/build-deps/usr/include BUNDLE_NO_PROXY=localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 ftp_proxy=socks5h://127.0.0.1:33953 NODE_USE_ENV_PROXY=1 LIBCLANG_PATH=/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib PIP_PROXY=http://127.0.0.1:42211 LDFLAGS='-L/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu -Wl,-rpath,/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu' HOME=/home/agent CODEX_SESSION_ID=01a1b2fa-ea14-702b-9afd-0d7ea81d7068 LANG=C.UTF-8 NPM_CONFIG_AUDIT=false CODEX_PRIMARY_RUNTIME_PYTHON=/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3 CARGO_HOME=/workspace/scratch/908399f6f132/cargo BROWSER_USE_AUTOMATIC_OTP_ENABLED=0 CODEX_FLORA_CCA_REUSE_EXECUTOR=1 npm_config_proxy=http://127.0.0.1:42211 DOCKER_HTTP_PROXY=http://127.0.0.1:42211 NETWORK=caas_agent_chrome YARN_HTTP_PROXY=http://127.0.0.1:42211 TMPDIR=/tmp WSS_PROXY=http://127.0.0.1:42211 https_proxy=http://127.0.0.1:42211 CODEX_NETWORK_ALLOW_LOCAL_BINDING=1 NPM_CONFIG_PROXY=http://127.0.0.1:42211 NPM_CONFIG_HTTPS_PROXY=http://127.0.0.1:42211 CODEX_ENVIRONMENT_ID=ccarenv_b64_Y2NhcmVudl82YWU4ZDRiYzU3NzA4MTkxODBkNzEzMmU4ZDJhYzhmZg CODEX_HOME=/home/agent/.codex XDG_CACHE_HOME=/home/agent/.cache CODEX_PRIMARY_RUNTIME_NODE=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node CODEX_PRIMARY_RUNTIME_BUNDLE_VERSION=26.1105.12137 NPM_CONFIG_PREFIX=/home/agent/.local CAAS_IMAGE_GIT_COMMIT_SHA=255dabb2b85e31ed8261a9c7f6d43e977085431d ENABLE_BROWSER_CREDENTIAL_CAPABILITIES=false TERM=dumb ELECTRON_GET_USE_PROXY=true CLOUD_AEON_OS_PERSONALIZATION_URL=https://chatgpt.com/backend-api/cloud-aeons/os-personalization RUSTUP_HOME=/workspace/scratch/908399f6f132/rustup CODEX_THREAD_ID=01a1b2fa-ea14-702b-9afd-0d7ea81d7068 CODEX_PROXY_CERT=/usr/local/share/ca-certificates/nebula-dns.crt OTEL_TRACES_SAMPLER=parentbased_traceidratio npm_config_http_proxy=http://127.0.0.1:42211 GIT_PAGER=cat NO_PROXY=localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 CODEX_FLORA_CCA_EXPECTED_EXECUTOR_PID='' FTP_PROXY=socks5h://127.0.0.1:33953 BUNDLE_HTTP_PROXY=http://127.0.0.1:42211 CODEX_APPLY_PATCH_PRESERVE_LINE_ENDINGS=1 SHLVL=1 CODEX_PRIMARY_RUNTIME=/opt/codex/runtimes/codex-primary-runtime SITES_MANAGED_LINUX_CONTAINER=1 PAGER=cat HTTPS_PROXY=http://127.0.0.1:42211 HTTP_PROXY=http://127.0.0.1:42211 http_proxy=http://127.0.0.1:42211 NPM_CONFIG_FUND=false NO_COLOR=1 XDG_STATE_HOME=/home/agent/.local/state PLAYWRIGHT_NODEJS_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib WS_PROXY=http://127.0.0.1:42211 CODEX_CI=1 LC_CTYPE=C.UTF-8 CODEX_BROWSER_DEFER_ACTIVATION=1 XDG_RUNTIME_DIR=/home/agent/.local/run SSL_CERT_FILE=/usr/local/share/ca-certificates/nebula-dns.crt PKG_CONFIG_SYSROOT_DIR=/workspace/scratch/908399f6f132/build-deps NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules ALL_PROXY=socks5h://127.0.0.1:33953 PIP_CERT=/usr/local/share/ca-certificates/nebula-dns.crt REQUESTS_CA_BUNDLE=/usr/local/share/ca-certificates/nebula-dns.crt wss_proxy=http://127.0.0.1:42211 CODEX_TOOL_CALL_ID=exec-c7f9b008-8e90-471e-aac3-92a7300a0036 GRADLE_OPTS='-Dhttp.proxyHost=browser-proxy -Dhttp.proxyPort=8889 -Dhttps.proxyHost=browser-proxy -Dhttps.proxyPort=8889' DD_SERVICE=sa-server-worker-sampling LC_ALL=C.UTF-8 BINDGEN_EXTRA_CLANG_ARGS=-resource-dir=/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib/clang/19 ENABLE_BROWSER_WEBMCP=false CODEX_SANDBOX_NETWORK_DISABLED=1 ws_proxy=http://127.0.0.1:42211 all_proxy=socks5h://127.0.0.1:33953 NPM_CONFIG_HTTP_PROXY=http://127.0.0.1:42211 npm_config_noproxy=localhost,127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 PATH=/workspace/scratch/908399f6f132/build-tools/bin:/workspace/scratch/908399f6f132/cargo/bin:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/bin:/workspace/scratch/908399f6f132/build-deps/usr/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback CODEX_NETWORK_PROXY_ACTIVE=1 CFLAGS=-I/workspace/scratch/908399f6f132/build-deps/usr/include YARN_HTTPS_PROXY=http://127.0.0.1:42211 RUST_LOG=warn,codex_exec_server::remote=info CODEX_PRIMARY_RUNTIME_NODE_MODULES=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules CODEX_FLORA_CCA_WORKSPACE_CWD=/workspace/scratch/908399f6f132 CODEX_FLORA_CCA_BOOTSTRAP_ATTEMPT_ID=c5acaf77-c6dc-47d3-96c3-f29a019b9f0e CODEX_FLORA_CCA_GATEWAY_HOST_ALIASES='' DEBIAN_FRONTEND=noninteractive npm_config_https_proxy=http://127.0.0.1:42211 DOCKER_HTTPS_PROXY=http://127.0.0.1:42211 CAAS_IMAGE_VERSION=20261106072655-255dabb2b85e _=/workspace/scratch/908399f6f132/build-tools/bin/meson 
+
+==================================== 1/11 ====================================
+test:         nouveau - mesa:nil
+start time:   16:09:08
+duration:     0.01s
+result:       exit status 0
+command:      LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=207 MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/nil/nil --test --format pretty
+----------------------------------- stdout -----------------------------------
+
+running 1 test
+test zcull::tests::test_reference ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+==============================================================================
+
+==================================== 2/11 ====================================
+test:         nouveau - mesa:nak
+start time:   16:09:08
+duration:     0.02s
+result:       exit status 0
+command:      ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MESON_TEST_ITERATION=1 MALLOC_PERTURB_=49 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler/nak --skip hw_tests:: --skip nvdisasm_tests:: --test --format pretty
+----------------------------------- stdout -----------------------------------
+
+running 9 tests
+test calc_instr_deps::tests::test_texdepbar_basic ... ok
+test opt_instr_sched_prepass::test_next_occupancy_cliff ... ok
+test ssa_value::tests::test_ssa_value_print ... ok
+test union_find::tests::test_basic ... ok
+test calc_instr_deps::tests::test_texdepbar_overflow ... ok
+test ssa_value::test_ssa_ref_round_trip ... ok
+test union_find::tests::test_binary_tree_height ... ok
+test union_find::tests::test_chain_b_height ... ok
+test union_find::tests::test_chain_a_height ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 53 filtered out; finished in 0.01s
+
+==============================================================================
+
+==================================== 3/11 ====================================
+test:         nouveau - mesa:mme_builder
+start time:   16:09:08
+duration:     0.03s
+result:       exit status 0
+command:      MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/mme/mme_builder_test
+----------------------------------- stdout -----------------------------------
+Running main() from ../src/gtest/src/gtest_main.cc
+[==========] Running 13 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 13 tests from mme_builder_test
+[ RUN      ] mme_builder_test.sanity
+[       OK ] mme_builder_test.sanity (0 ms)
+[ RUN      ] mme_builder_test.add
+[       OK ] mme_builder_test.add (0 ms)
+[ RUN      ] mme_builder_test.add_imm
+[       OK ] mme_builder_test.add_imm (0 ms)
+[ RUN      ] mme_builder_test.sub
+[       OK ] mme_builder_test.sub (0 ms)
+[ RUN      ] mme_builder_test.sub_imm
+[       OK ] mme_builder_test.sub_imm (0 ms)
+[ RUN      ] mme_builder_test.mul_32x32_32
+[       OK ] mme_builder_test.mul_32x32_32 (0 ms)
+[ RUN      ] mme_builder_test.umul_32x32_64
+[       OK ] mme_builder_test.umul_32x32_64 (0 ms)
+[ RUN      ] mme_builder_test.umul_32x64_64
+[       OK ] mme_builder_test.umul_32x64_64 (5 ms)
+[ RUN      ] mme_builder_test.sll_srl
+[       OK ] mme_builder_test.sll_srl (0 ms)
+[ RUN      ] mme_builder_test.not
+[       OK ] mme_builder_test.not (0 ms)
+[ RUN      ] mme_builder_test.and_not
+[       OK ] mme_builder_test.and_not (0 ms)
+[ RUN      ] mme_builder_test.merge
+[       OK ] mme_builder_test.merge (0 ms)
+[ RUN      ] mme_builder_test.while_ine
+[       OK ] mme_builder_test.while_ine (0 ms)
+[----------] 13 tests from mme_builder_test (6 ms total)
+
+[----------] Global test environment tear-down
+[==========] 13 tests from 1 test suite ran. (6 ms total)
+[  PASSED  ] 13 tests.
+==============================================================================
+
+==================================== 4/11 ====================================
+test:         nouveau - mesa:nvk_cmd_cache_unset
+start time:   16:09:08
+duration:     0.03s
+result:       exit status 0
+command:      ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=5 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/vulkan/test_nvk_cmd_cache 0x117 unset 512
+----------------------------------- stdout -----------------------------------
+PASS chipset=0x117 limit_kib=unset retained_blocks=512 freed_blocks=0
+==============================================================================
+
+==================================== 5/11 ====================================
+test:         nouveau - mesa:nvk_cmd_cache_disabled
+start time:   16:09:08
+duration:     0.03s
+result:       exit status 0
+command:      MALLOC_PERTURB_=68 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/vulkan/test_nvk_cmd_cache 0x117 -1 512
+----------------------------------- stdout -----------------------------------
+PASS chipset=0x117 limit_kib=-1 retained_blocks=512 freed_blocks=0
+==============================================================================
+
+==================================== 6/11 ====================================
+test:         nouveau - mesa:nvk_cmd_cache_zero
+start time:   16:09:08
+duration:     0.02s
+result:       exit status 0
+command:      ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=83 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/vulkan/test_nvk_cmd_cache 0x117 0 0
+----------------------------------- stdout -----------------------------------
+PASS chipset=0x117 limit_kib=0 retained_blocks=0 freed_blocks=512
+==============================================================================
+
+==================================== 7/11 ====================================
+test:         nouveau - mesa:nvk_cmd_cache_sub_block
+start time:   16:09:08
+duration:     0.02s
+result:       exit status 0
+command:      MALLOC_PERTURB_=82 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/vulkan/test_nvk_cmd_cache 0x117 63 0
+----------------------------------- stdout -----------------------------------
+PASS chipset=0x117 limit_kib=63 retained_blocks=0 freed_blocks=512
+==============================================================================
+
+==================================== 8/11 ====================================
+test:         nouveau - mesa:nvk_cmd_cache_one_block
+start time:   16:09:08
+duration:     0.02s
+result:       exit status 0
+command:      ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MALLOC_PERTURB_=166 MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/vulkan/test_nvk_cmd_cache 0x117 64 1
+----------------------------------- stdout -----------------------------------
+PASS chipset=0x117 limit_kib=64 retained_blocks=1 freed_blocks=511
+==============================================================================
+
+==================================== 9/11 ====================================
+test:         nouveau - mesa:nvk_cmd_cache_bounded
+start time:   16:09:08
+duration:     0.01s
+result:       exit status 0
+command:      ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=142 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/vulkan/test_nvk_cmd_cache 0x117 256 4
+----------------------------------- stdout -----------------------------------
+PASS chipset=0x117 limit_kib=256 retained_blocks=4 freed_blocks=508
+==============================================================================
+
+=================================== 10/11 ====================================
+test:         nouveau - mesa:nvk_mme
+start time:   16:09:08
+duration:     0.01s
+result:       exit status 0
+command:      MALLOC_PERTURB_=185 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/vulkan/test_nvk_mme
+==============================================================================
+
+=================================== 11/11 ====================================
+test:         nouveau - mesa:nvk_cmd_cache_non_gm107
+start time:   16:09:08
+duration:     0.01s
+result:       exit status 0
+command:      ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=79 LD_LIBRARY_PATH=/workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/compiler:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/paste-1.0.14:/workspace/scratch/908399f6f132/mesa-gm107/build-headless/subprojects/libdrm-2.4.133:/workspace/scratch/908399f6f132/build-deps/usr/lib/x86_64-linux-gnu:/workspace/scratch/908399f6f132/build-deps/usr/lib/llvm-19/lib MESON_TEST_ITERATION=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /workspace/scratch/908399f6f132/mesa-gm107/build-headless/src/nouveau/vulkan/test_nvk_cmd_cache 0x120 256 512
+----------------------------------- stdout -----------------------------------
+PASS chipset=0x120 limit_kib=256 retained_blocks=512 freed_blocks=0
+==============================================================================
+
+
+Ok:                11  
+Fail:              0   

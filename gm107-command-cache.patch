@@ -1,0 +1,319 @@
+From 9c7293159630de87b66779a614e314503083b1a3 Mon Sep 17 00:00:00 2001
+From: Codex <codex@example.invalid>
+Date: Mon, 9 Nov 2026 17:13:07 +0100
+Subject: [PATCH] nvk: add opt-in bounded GM107 command memory recycling
+ experiment
+
+---
+ docs/drivers/nvk.rst                    |  17 +++
+ src/nouveau/vulkan/meson.build          |  19 ++++
+ src/nouveau/vulkan/nvk_cmd_pool.c       |  39 +++++++
+ src/nouveau/vulkan/nvk_cmd_pool.h       |   7 ++
+ src/nouveau/vulkan/test_nvk_cmd_cache.c | 141 ++++++++++++++++++++++++
+ 5 files changed, 223 insertions(+)
+ create mode 100644 src/nouveau/vulkan/test_nvk_cmd_cache.c
+
+diff --git a/docs/drivers/nvk.rst b/docs/drivers/nvk.rst
+index 2147598..d95e208 100644
+--- a/docs/drivers/nvk.rst
++++ b/docs/drivers/nvk.rst
+@@ -3,6 +3,23 @@ NVK
+ 
+ NVK is a Vulkan driver for NVIDIA GPUs.
+ 
++GM107 command-cache experiment (local patch)
++--------------------------------------------
++
++``NVK_GM107_CMD_CACHE_LIMIT_KIB`` is an opt-in experimental per-command-pool
++limit on cached, returned LOCAL-capable command memory. It is only read on
++GM107 (chipset 0x117). Unset or negative values preserve upstream recycling.
++Nonnegative values are rounded down to 64 KiB blocks; zero disables this
++cache. A starting experiment is 256 KiB (four buffers). Restart the process
++when changing this variable.
++
++Only buffers returned by command buffer reset or destruction are eligible.
++Live buffers, GART caches, QMD heaps, shaders, textures and synchronization
++semantics are unchanged. This is not a global VRAM cap: LOCAL-capable buffers
++can reside in VRAM or system memory and applications can create many pools.
++Reducing retention may increase allocation overhead. No hardware performance
++or memory-use improvement has been established by this patch's CPU tests.
++
+ Hardware support
+ ----------------
+ 
+diff --git a/src/nouveau/vulkan/meson.build b/src/nouveau/vulkan/meson.build
+index f0bb780..642ceae 100644
+--- a/src/nouveau/vulkan/meson.build
++++ b/src/nouveau/vulkan/meson.build
+@@ -228,6 +228,25 @@ _dev_icd = custom_target(
+ devenv.append('VK_DRIVER_FILES', _dev_icd.full_path())
+ 
+ if with_tests and not with_platform_android
++  cmd_cache_test = executable(
++    'test_nvk_cmd_cache',
++    files('test_nvk_cmd_cache.c'),
++    dependencies : [nvk_deps],
++    link_with : [libnvk],
++  )
++  foreach case : [
++    ['unset', '0x117', 'unset', '512'],
++    ['disabled', '0x117', '-1', '512'],
++    ['zero', '0x117', '0', '0'],
++    ['sub_block', '0x117', '63', '0'],
++    ['one_block', '0x117', '64', '1'],
++    ['bounded', '0x117', '256', '4'],
++    ['non_gm107', '0x120', '256', '512'],
++  ]
++    test('nvk_cmd_cache_' + case[0], cmd_cache_test,
++         args : [case[1], case[2], case[3]], suite : ['nouveau'])
++  endforeach
++
+   test(
+     'nvk_mme',
+     executable(
+diff --git a/src/nouveau/vulkan/nvk_cmd_pool.c b/src/nouveau/vulkan/nvk_cmd_pool.c
+index 7297e94..35c6847 100644
+--- a/src/nouveau/vulkan/nvk_cmd_pool.c
++++ b/src/nouveau/vulkan/nvk_cmd_pool.c
+@@ -9,6 +9,8 @@
+ #include "nvk_physical_device.h"
+ #include "nvkmd/nvkmd.h"
+ 
++#include "util/u_debug.h"
++
+ static VkResult
+ nvk_cmd_mem_create(struct nvk_cmd_pool *pool, bool force_gart, struct nvk_cmd_mem **mem_out)
+ {
+@@ -102,6 +104,20 @@ nvk_CreateCommandPool(VkDevice _device,
+    list_inithead(&pool->free_gart_mem);
+    list_inithead(&pool->free_qmd);
+ 
++   pool->free_mem_limit = UINT32_MAX;
++   pool->free_mem_count = 0;
++
++   const struct nvk_physical_device *pdev = nvk_device_physical(device);
++   if (pdev->info.chipset == 0x117) {
++      const int64_t limit_kib =
++         debug_get_num_option("NVK_GM107_CMD_CACHE_LIMIT_KIB", -1);
++      if (limit_kib >= 0) {
++         pool->free_mem_limit = MIN2((uint64_t)limit_kib /
++                                       (NVK_CMD_MEM_SIZE / 1024),
++                                    UINT32_MAX);
++      }
++   }
++
+    *pCmdPool = nvk_cmd_pool_to_handle(pool);
+ 
+    return VK_SUCCESS;
+@@ -114,6 +130,7 @@ nvk_cmd_pool_destroy_mem(struct nvk_cmd_pool *pool)
+       nvk_cmd_mem_destroy(pool, mem);
+ 
+    list_inithead(&pool->free_mem);
++   pool->free_mem_count = 0;
+ 
+    list_for_each_entry_safe(struct nvk_cmd_mem, mem, &pool->free_gart_mem, link)
+       nvk_cmd_mem_destroy(pool, mem);
+@@ -143,6 +160,10 @@ nvk_cmd_pool_alloc_mem(struct nvk_cmd_pool *pool, bool force_gart,
+ 
+    if (mem) {
+       list_del(&mem->link);
++      if (!force_gart && pool->free_mem_limit != UINT32_MAX) {
++         assert(pool->free_mem_count > 0);
++         pool->free_mem_count--;
++      }
+    } else {
+       VkResult result = nvk_cmd_mem_create(pool, force_gart, &mem);
+       if (result != VK_SUCCESS)
+@@ -176,6 +197,24 @@ void
+ nvk_cmd_pool_free_mem_list(struct nvk_cmd_pool *pool,
+                            struct list_head *mem_list)
+ {
++   if (pool->free_mem_limit != UINT32_MAX) {
++      /* These buffers have been returned by command buffer reset/destruction.
++       * Never inspect or evict buffers still owned by a command buffer.
++       * Vulkan requires external synchronization of the parent command pool.
++       */
++      list_for_each_entry_safe(struct nvk_cmd_mem, mem, mem_list, link) {
++         list_del(&mem->link);
++         if (pool->free_mem_count < pool->free_mem_limit) {
++            list_addtail(&mem->link, &pool->free_mem);
++            pool->free_mem_count++;
++         } else {
++            nvk_cmd_mem_destroy(pool, mem);
++         }
++      }
++      list_inithead(mem_list);
++      return;
++   }
++
+    list_splicetail(mem_list, &pool->free_mem);
+    list_inithead(mem_list);
+ }
+diff --git a/src/nouveau/vulkan/nvk_cmd_pool.h b/src/nouveau/vulkan/nvk_cmd_pool.h
+index 6d556ef..c96ce28 100644
+--- a/src/nouveau/vulkan/nvk_cmd_pool.h
++++ b/src/nouveau/vulkan/nvk_cmd_pool.h
+@@ -38,6 +38,13 @@ struct nvk_cmd_pool {
+    struct list_head free_mem;
+    struct list_head free_gart_mem;
+    struct list_head free_qmd;
++
++   /* Experimental GM107 cache bound, in NVK_CMD_MEM_SIZE blocks.
++    * UINT32_MAX preserves the upstream unbounded recycling policy.
++    * Only free_mem is counted; live buffers and GART/QMD caches are excluded.
++    */
++   uint32_t free_mem_limit;
++   uint32_t free_mem_count;
+ };
+ 
+ VK_DEFINE_NONDISP_HANDLE_CASTS(nvk_cmd_pool, vk.base, VkCommandPool,
+diff --git a/src/nouveau/vulkan/test_nvk_cmd_cache.c b/src/nouveau/vulkan/test_nvk_cmd_cache.c
+new file mode 100644
+index 0000000..cd57f53
+--- /dev/null
++++ b/src/nouveau/vulkan/test_nvk_cmd_cache.c
+@@ -0,0 +1,141 @@
++/* SPDX-License-Identifier: MIT
++ * Hardware-free tests of the real NVK command-pool recycling path.
++ * Only backing memory objects are mocked; no GPU work is submitted.
++ */
++#include "nvk_cmd_pool.h"
++#include "nvk_device.h"
++#include "nvk_entrypoints.h"
++#include "nvk_physical_device.h"
++#include "nvkmd/nvkmd.h"
++#include "vk_alloc.h"
++
++#include <stdio.h>
++#include <stdlib.h>
++
++#define CHECK(x) do { if (!(x)) { \
++   fprintf(stderr, "CHECK failed: %s:%d: %s\n", __FILE__, __LINE__, #x); \
++   abort(); \
++} } while (0)
++
++static unsigned freed;
++
++static void
++fake_mem_free(struct nvkmd_mem *mem)
++{
++   freed++;
++   simple_mtx_destroy(&mem->map_mutex);
++   free(mem);
++}
++
++static const struct nvkmd_mem_ops fake_mem_ops = { .free = fake_mem_free };
++
++static struct nvk_cmd_mem *
++new_mem(struct nvkmd_dev *dev)
++{
++   struct nvk_cmd_mem *cmd = calloc(1, sizeof(*cmd));
++   CHECK(cmd);
++   cmd->mem = calloc(1, sizeof(*cmd->mem));
++   CHECK(cmd->mem);
++   nvkmd_mem_init(dev, cmd->mem, &fake_mem_ops, NVKMD_MEM_LOCAL,
++                 NVK_CMD_MEM_SIZE, 4096);
++   list_addtail(&cmd->mem->link, &dev->mems);
++   return cmd;
++}
++
++static unsigned
++count(const struct list_head *head)
++{
++   unsigned n = 0;
++   for (const struct list_head *p = head->next; p != head; p = p->next)
++      n++;
++   return n;
++}
++
++int
++main(int argc, char **argv)
++{
++   CHECK(argc == 4);
++   const uint32_t chipset = strtoul(argv[1], NULL, 0);
++   const unsigned expected = strtoul(argv[3], NULL, 0);
++   if (strcmp(argv[2], "unset") == 0)
++      unsetenv("NVK_GM107_CMD_CACHE_LIMIT_KIB");
++   else
++      setenv("NVK_GM107_CMD_CACHE_LIMIT_KIB", argv[2], 1);
++
++   struct nvk_physical_device pdev = { .info.chipset = chipset };
++   struct nvk_device dev = {0};
++   dev.vk.base.type = VK_OBJECT_TYPE_DEVICE;
++   dev.vk.physical = &pdev.vk;
++   dev.vk.alloc = *vk_default_allocator();
++   struct nvkmd_dev kdev = {0};
++   simple_mtx_init(&kdev.mems_mutex, mtx_plain);
++   list_inithead(&kdev.mems);
++
++   const VkCommandPoolCreateInfo info = {
++      .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
++   };
++   VkCommandPool handle;
++   CHECK(nvk_CreateCommandPool(nvk_device_to_handle(&dev), &info, NULL,
++                              &handle) == VK_SUCCESS);
++   struct nvk_cmd_pool *pool = nvk_cmd_pool_from_handle(handle);
++
++   /* Simulate a 32 MiB burst of returned LOCAL-capable command BOs.
++    * Keep another object owned outside the pool to catch premature eviction.
++    */
++   struct nvk_cmd_mem *live = new_mem(&kdev);
++   struct list_head returned;
++   list_inithead(&returned);
++   for (unsigned i = 0; i < 512; i++) {
++      struct nvk_cmd_mem *mem = new_mem(&kdev);
++      list_addtail(&mem->link, &returned);
++   }
++   nvk_cmd_pool_free_mem_list(pool, &returned);
++   CHECK(list_is_empty(&returned));
++   CHECK(count(&pool->free_mem) == expected);
++   CHECK(freed == 512 - expected);
++   CHECK(live->mem->refcnt == 1);
++   CHECK(count(&kdev.mems) == expected + 1);
++
++   /* Reuse/return must not underflow or allow the cache to grow. */
++   if (expected) {
++      for (unsigned i = 0; i < 1000; i++) {
++         struct nvk_cmd_mem *mem;
++         CHECK(nvk_cmd_pool_alloc_mem(pool, false, &mem) == VK_SUCCESS);
++         CHECK(count(&pool->free_mem) == expected - 1);
++         list_addtail(&mem->link, &returned);
++         nvk_cmd_pool_free_mem_list(pool, &returned);
++         CHECK(count(&pool->free_mem) == expected);
++      }
++   }
++
++   /* GART recycling is deliberately unaffected. */
++   struct nvk_cmd_mem *gart = new_mem(&kdev);
++   gart->mem->flags = NVKMD_MEM_GART;
++   list_addtail(&gart->link, &returned);
++   nvk_cmd_pool_free_gart_mem_list(pool, &returned);
++   CHECK(count(&pool->free_gart_mem) == 1);
++   struct nvk_cmd_mem *got;
++   CHECK(nvk_cmd_pool_alloc_mem(pool, true, &got) == VK_SUCCESS);
++   CHECK(got == gart);
++   list_addtail(&got->link, &returned);
++   nvk_cmd_pool_free_gart_mem_list(pool, &returned);
++
++   nvk_TrimCommandPool(nvk_device_to_handle(&dev), handle, 0);
++   CHECK(list_is_empty(&pool->free_mem));
++   CHECK(list_is_empty(&pool->free_gart_mem));
++   CHECK(pool->free_mem_count == 0);
++   CHECK(freed == 513);
++   CHECK(count(&kdev.mems) == 1);
++
++   /* Return after trim checks counter reset and final destruction. */
++   list_addtail(&live->link, &returned);
++   nvk_cmd_pool_free_mem_list(pool, &returned);
++   CHECK(count(&pool->free_mem) == (expected ? 1 : 0));
++   nvk_DestroyCommandPool(nvk_device_to_handle(&dev), handle, NULL);
++   CHECK(freed == 514);
++   CHECK(list_is_empty(&kdev.mems));
++   simple_mtx_destroy(&kdev.mems_mutex);
++   printf("PASS chipset=0x%x limit_kib=%s retained_blocks=%u freed_blocks=%u\n",
++          chipset, argv[2], expected, 512 - expected);
++   return 0;
++}
+-- 
+2.52.0
+

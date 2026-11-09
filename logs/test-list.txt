@@ -1,0 +1,11 @@
+nouveau - mesa:nil
+nouveau - mesa:nak
+nouveau - mesa:mme_builder
+nouveau - mesa:nvk_cmd_cache_unset
+nouveau - mesa:nvk_cmd_cache_disabled
+nouveau - mesa:nvk_cmd_cache_zero
+nouveau - mesa:nvk_cmd_cache_sub_block
+nouveau - mesa:nvk_cmd_cache_one_block
+nouveau - mesa:nvk_cmd_cache_bounded
+nouveau - mesa:nvk_cmd_cache_non_gm107
+nouveau - mesa:nvk_mme
