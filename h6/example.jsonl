@@ -1,0 +1,5 @@
+{"t_s":0,"gpu":"GM107","driver":"nouveau","game_active":true,"busy_pct":92,"busy_trusted":true,"temp_c":55}
+{"t_s":5,"gpu":"GM107","driver":"nouveau","game_active":true,"busy_pct":91,"busy_trusted":true,"temp_c":56}
+{"t_s":11,"gpu":"GM107","driver":"nouveau","game_active":true,"busy_pct":90,"busy_trusted":true,"temp_c":58}
+{"t_s":13,"gpu":"GM107","driver":"nouveau","game_active":true,"busy_pct":88,"busy_trusted":true,"temp_c":77}
+{"t_s":40,"gpu":"GM107","driver":"nouveau","game_active":true,"busy_pct":0,"busy_trusted":false,"temp_c":55}
