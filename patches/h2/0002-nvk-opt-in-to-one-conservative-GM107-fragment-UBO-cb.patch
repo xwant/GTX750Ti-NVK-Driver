@@ -1,0 +1,389 @@
+From 248e991b6157618cf7715500358729ea9dccb23c Mon Sep 17 00:00:00 2001
+From: Codex <codex@example.invalid>
+Date: Tue, 10 Nov 2026 15:05:40 +0100
+Subject: [PATCH] nvk: opt in to one conservative GM107 fragment UBO cbuf
+
+Preserve upstream slots, exclude robust2 and unknown indexing, separate compiler cache identity, and test real NIR lowering and full SM50 compilation.
+---
+ docs/drivers/nvk.rst                          |  20 ++
+ src/nouveau/vulkan/meson.build                |   2 +
+ src/nouveau/vulkan/nvk_debug.h                |   1 +
+ src/nouveau/vulkan/nvk_instance.c             |   1 +
+ .../vulkan/nvk_nir_lower_descriptors.c        |  20 +-
+ src/nouveau/vulkan/nvk_physical_device.h      |   8 +
+ src/nouveau/vulkan/nvk_shader.c               |   3 +-
+ src/nouveau/vulkan/test_nvk_gm107_ubo.c       | 213 ++++++++++++++++++
+ 8 files changed, 263 insertions(+), 5 deletions(-)
+ create mode 100644 src/nouveau/vulkan/test_nvk_gm107_ubo.c
+
+diff --git a/docs/drivers/nvk.rst b/docs/drivers/nvk.rst
+index 21475984..2ea4238a 100644
+--- a/docs/drivers/nvk.rst
++++ b/docs/drivers/nvk.rst
+@@ -103,3 +103,23 @@ Developer info
+    :glob:
+ 
+    nvk/*
++
++Experimental GM107 UBO policy
++----------------------------
++
++``NVK_DEBUG=gm107_ubo_diag`` logs JSON compile observations for GM107 fragment
++shaders, prefixed by ``NVK_GM107_UBO``. Rejection masks are 1 (descriptor type),
++2 (dynamic byte offset), and 4 (range). Cached binaries are reported as cache
++hits, not compiler coverage. Buffer contents are not logged. Compilation is
++not evidence of shader execution or hotness.
++
++``NVK_DEBUG=gm107_ubo_cbuf`` opts into appending at most one ordinary UBO cbuf
++on GM107 fragment shaders, after all upstream bindings. It requires at least
++eight static loads and constant descriptor/byte offsets within the constant
++window. Unknown indexing, robustBufferAccess2, indirect shader binding and
++``no_cbuf`` disable promotion. Existing binding commands and barriers are
++unchanged. Indirect binding overhead may exceed shader savings.
++
++Both flags participate in compiler cache identity. Use separate warmed cache
++directories for timings and disable the disk shader cache only for diagnostic
++runs. No performance improvement on hardware has been demonstrated.
+diff --git a/src/nouveau/vulkan/meson.build b/src/nouveau/vulkan/meson.build
+index f0bb780f..99266f26 100644
+--- a/src/nouveau/vulkan/meson.build
++++ b/src/nouveau/vulkan/meson.build
+@@ -228,6 +228,8 @@ _dev_icd = custom_target(
+ devenv.append('VK_DRIVER_FILES', _dev_icd.full_path())
+ 
+ if with_tests and not with_platform_android
++  test('nvk_gm107_ubo', executable('test_nvk_gm107_ubo', files('test_nvk_gm107_ubo.c'),
++       dependencies : [nvk_deps], link_with : [libnvk]), suite : ['nouveau'])
+   test(
+     'nvk_mme',
+     executable(
+diff --git a/src/nouveau/vulkan/nvk_debug.h b/src/nouveau/vulkan/nvk_debug.h
+index 39065697..2218e355 100644
+--- a/src/nouveau/vulkan/nvk_debug.h
++++ b/src/nouveau/vulkan/nvk_debug.h
+@@ -46,6 +46,7 @@ enum nvk_debug {
+    /* Disable image compression */
+    NVK_DEBUG_NO_COMPRESSION = 1ull << 9,
+    NVK_DEBUG_GM107_UBO_DIAG = 1ull << 10,
++   NVK_DEBUG_GM107_UBO_CBUF = 1ull << 11,
+ };
+ 
+ enum nvk_experimental {
+diff --git a/src/nouveau/vulkan/nvk_instance.c b/src/nouveau/vulkan/nvk_instance.c
+index 484def37..977f04bc 100644
+--- a/src/nouveau/vulkan/nvk_instance.c
++++ b/src/nouveau/vulkan/nvk_instance.c
+@@ -90,6 +90,7 @@ nvk_init_debug_flags(struct nvk_instance *instance)
+       { "vm", NVK_DEBUG_VM },
+       { "no_cbuf", NVK_DEBUG_NO_CBUF },
+       { "gm107_ubo_diag", NVK_DEBUG_GM107_UBO_DIAG },
++      { "gm107_ubo_cbuf", NVK_DEBUG_GM107_UBO_CBUF },
+       { "edb_bview", NVK_DEBUG_FORCE_EDB_BVIEW },
+       { "gart", NVK_DEBUG_FORCE_GART },
+       { "coherent", NVK_DEBUG_FORCE_COHERENT },
+diff --git a/src/nouveau/vulkan/nvk_nir_lower_descriptors.c b/src/nouveau/vulkan/nvk_nir_lower_descriptors.c
+index e4a92c75..075ed523 100644
+--- a/src/nouveau/vulkan/nvk_nir_lower_descriptors.c
++++ b/src/nouveau/vulkan/nvk_nir_lower_descriptors.c
+@@ -70,7 +70,7 @@ struct lower_descriptors_ctx {
+ 
+    struct hash_table *cbufs;
+    struct nvk_cbuf_map *cbuf_map;
+-   bool gm107_analyze, gm107_diag, gm107_no_cbuf, gm107_robust2;
++   bool gm107_promote, gm107_analyze, gm107_diag, gm107_no_cbuf, gm107_robust2;
+    uint32_t gm107_loads, gm107_unknown, gm107_dynamic_ubos;
+    char gm107_hash[BLAKE3_HEX_LEN];
+ };
+@@ -554,7 +554,18 @@ build_cbuf_map(nir_shader *nir, struct lower_descriptors_ctx *ctx)
+       ctx->cbuf_map->cbufs[ctx->cbuf_map->cbuf_count++] = cbufs[i].key;
+    }
+ 
+-   gm107_report(ctx, cbufs, num_cbufs, -1);
++   /* Append only after upstream has selected all of its slots. */
++   int selected = -1;
++   if (ctx->gm107_promote && !ctx->gm107_robust2 && !ctx->gm107_unknown &&
++       ctx->cbuf_map->cbuf_count < max_cbuf_bindings) {
++      for (unsigned i = 0; i < num_cbufs; i++) {
++         if (!gm107_ubo_candidate(&cbufs[i])) continue;
++         selected = ctx->cbuf_map->cbuf_count++;
++         ctx->cbuf_map->cbufs[selected] = cbufs[i].key;
++         break;
++      }
++   }
++   gm107_report(ctx, cbufs, num_cbufs, selected);
+    ralloc_free(ctx->cbufs);
+    ctx->cbufs = NULL;
+ }
+@@ -1650,12 +1661,13 @@ nvk_nir_lower_descriptors(nir_shader *nir,
+       .ssbo_addr_format = nvk_ssbo_addr_format(pdev, rs),
+       .ubo_addr_format = nvk_ubo_addr_format(pdev, rs),
+       .gm107_analyze = pdev->info.chipset == 0x117 && nir->info.stage == MESA_SHADER_FRAGMENT &&
+-                       (pdev->debug_flags & NVK_DEBUG_GM107_UBO_DIAG),
++                       (pdev->debug_flags & (NVK_DEBUG_GM107_UBO_DIAG | NVK_DEBUG_GM107_UBO_CBUF)),
++      .gm107_promote = nvk_gm107_ubo_cbuf_enabled(pdev) && nir->info.stage == MESA_SHADER_FRAGMENT,
+       .gm107_no_cbuf = pdev->debug_flags & NVK_DEBUG_NO_CBUF,
+       .gm107_robust2 = rs->uniform_buffers == VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2_EXT,
+    };
+ 
+-   ctx.gm107_diag = ctx.gm107_analyze;
++   ctx.gm107_diag = ctx.gm107_analyze && (pdev->debug_flags & NVK_DEBUG_GM107_UBO_DIAG);
+    if (ctx.gm107_diag) {
+       struct blob blob;
+       uint8_t hash[BLAKE3_OUT_LEN];
+diff --git a/src/nouveau/vulkan/nvk_physical_device.h b/src/nouveau/vulkan/nvk_physical_device.h
+index 06d4cc3b..a0f11c50 100644
+--- a/src/nouveau/vulkan/nvk_physical_device.h
++++ b/src/nouveau/vulkan/nvk_physical_device.h
+@@ -97,4 +97,12 @@ VkExtent2D nvk_max_shading_rate(const struct nvk_physical_device *pdev,
+ #define NVK_USE_WSI_PLATFORM
+ #endif
+ 
++static inline bool
++nvk_gm107_ubo_cbuf_enabled(const struct nvk_physical_device *pdev)
++{
++   return pdev->info.chipset == 0x117 &&
++          (pdev->debug_flags & NVK_DEBUG_GM107_UBO_CBUF) &&
++          !(pdev->debug_flags & NVK_DEBUG_NO_CBUF);
++}
++
+ #endif
+diff --git a/src/nouveau/vulkan/nvk_shader.c b/src/nouveau/vulkan/nvk_shader.c
+index 709876e4..ed02d4c9 100644
+--- a/src/nouveau/vulkan/nvk_shader.c
++++ b/src/nouveau/vulkan/nvk_shader.c
+@@ -82,6 +82,7 @@ nvk_physical_device_compiler_flags(const struct nvk_physical_device *pdev)
+       | (instance->drirc.misc.ssbo_align_4b ? 1 << 14 : 0)
+       | ((pdev->info.chipset == 0x117 &&
+           (pdev->debug_flags & NVK_DEBUG_GM107_UBO_DIAG)) ? UINT64_C(1) << 16 : 0)
++      | (nvk_gm107_ubo_cbuf_enabled(pdev) ? UINT64_C(1) << 15 : 0)
+       | (nak_flags << 48);
+ }
+ 
+@@ -1269,7 +1270,7 @@ nvk_deserialize_shader(struct vk_device *vk_dev,
+ 
+    struct nvk_cbuf_map cbuf_map;
+    blob_copy_bytes(blob, &cbuf_map, sizeof(cbuf_map));
+-   struct nvk_physical_device *pdev = nvk_device_physical(dev);
++   const struct nvk_physical_device *pdev = nvk_device_physical(dev);
+    if (!blob->overrun && pdev->info.chipset == 0x117 &&
+        (pdev->debug_flags & NVK_DEBUG_GM107_UBO_DIAG) &&
+        info.stage == MESA_SHADER_FRAGMENT)
+diff --git a/src/nouveau/vulkan/test_nvk_gm107_ubo.c b/src/nouveau/vulkan/test_nvk_gm107_ubo.c
+new file mode 100644
+index 00000000..eb3a5d02
+--- /dev/null
++++ b/src/nouveau/vulkan/test_nvk_gm107_ubo.c
+@@ -0,0 +1,213 @@
++/* SPDX-License-Identifier: MIT */
++#include "clb097.h"
++#include "nir_builder.h"
++#include "nir_serialize.h"
++#include "nvk_descriptor_set_layout.h"
++#include "nvk_device.h"
++#include "nvk_instance.h"
++#include "nvk_physical_device.h"
++#include "nvk_shader.h"
++#include "util/blob.h"
++#include "vk_alloc.h"
++#include "vk_pipeline.h"
++#include <stdio.h>
++#define CHECK(x)                                                                                   \
++   do {                                                                                            \
++      if (!(x)) {                                                                                  \
++         fprintf(stderr, "FAIL %d: %s\n", __LINE__, #x);                                           \
++         abort();                                                                                  \
++      }                                                                                            \
++   } while (0)
++struct fixture {
++   struct nvk_instance instance;
++   struct nvk_physical_device pdev;
++   struct nvk_device dev;
++   struct nvk_descriptor_set_layout *layout;
++   struct vk_pipeline_robustness_state rs;
++};
++struct options {
++   unsigned loads, ordinary, dynamic, offset, index;
++   bool dynamic_offset, dynamic_index, mixed, mutable, push;
++   mesa_shader_stage stage;
++};
++static nir_shader *make_shader(struct fixture *f, struct options o) {
++   unsigned bindings = o.ordinary + o.dynamic;
++   free(f->layout);
++   f->layout = calloc(1, sizeof(*f->layout) + bindings * sizeof(f->layout->binding[0]));
++   CHECK(f->layout);
++   f->layout->binding_count = bindings;
++   f->layout->vk.dynamic_descriptor_count = o.dynamic;
++   if (o.push)
++      f->layout->flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR;
++   nir_builder b = nir_builder_init_simple_shader(o.stage, nak_nir_options(f->pdev.nak), "h2-test");
++   nir_address_format fmt = nvk_ubo_addr_format(&f->pdev, &f->rs);
++   const struct glsl_type *array = glsl_array_type(glsl_uint_type(), 8192, 16);
++   nir_def *sum = nir_imm_int(&b, 0);
++   for (unsigned n = 0; n < bindings; n++) {
++      bool dyn = n >= o.ordinary;
++      f->layout->binding[n] = (struct nvk_descriptor_set_binding_layout){
++          .type = dyn         ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC
++                  : o.mutable ? VK_DESCRIPTOR_TYPE_MUTABLE_EXT
++                              : VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
++          .array_size = 2,
++          .stride = 16,
++          .offset = n * 32,
++          .dynamic_buffer_index = dyn ? n - o.ordinary : 0};
++      nir_def *idx = o.dynamic_index ? nir_load_subgroup_invocation(&b) : nir_imm_int(&b, o.index);
++      nir_def *resource = nir_vulkan_resource_index(
++          &b, nir_address_format_num_components(fmt), nir_address_format_bit_size(fmt), idx,
++          .desc_set = 0, .binding = n, .desc_type = nir_descriptor_type_uniform_buffer,
++          .resource_type = nir_resource_type_uniform_buffer);
++      nir_def *addr = nir_load_vulkan_descriptor(&b, nir_address_format_num_components(fmt),
++                                                 nir_address_format_bit_size(fmt), resource,
++                                                 .desc_type = nir_descriptor_type_uniform_buffer);
++      nir_deref_instr *base =
++          nir_build_deref_cast_with_alignment(&b, addr, nir_var_mem_ubo, array, 0, 16, 0);
++      for (unsigned i = 0; i < o.loads; i++) {
++         nir_def *element = (o.dynamic_offset || (o.mixed && i == 0))
++                                ? nir_load_subgroup_invocation(&b)
++                                : nir_imm_int(&b, o.offset / 16 + i);
++         sum = nir_iadd(&b, sum, nir_load_deref(&b, nir_build_deref_array(&b, base, element)));
++      }
++   }
++   if (o.stage == MESA_SHADER_COMPUTE) {
++      b.shader->info.shared_size = 4;
++      nir_store_shared(&b, sum, nir_imm_int(&b, 0), .align_mul = 4);
++   } else
++      nir_store_output(&b, sum, nir_imm_int(&b, 0), .write_mask = 1, .src_type = nir_type_uint32,
++                       .io_semantics = {.location = o.stage == MESA_SHADER_FRAGMENT
++                                                        ? FRAG_RESULT_DATA0
++                                                        : VARYING_SLOT_VAR0,
++                                        .num_slots = 1});
++   nir_validate_shader(b.shader, "fixture");
++   return b.shader;
++}
++static unsigned count_loads(nir_shader *s) {
++   unsigned count = 0;
++   nir_foreach_function_impl(impl, s) nir_foreach_block(block, impl) nir_foreach_instr(
++       i, block) if (i->type == nir_instr_type_intrinsic &&
++                     nir_instr_as_intrinsic(i)->intrinsic == nir_intrinsic_load_ubo) count++;
++   return count;
++}
++static void lower(struct fixture *f, nir_shader *s, uint32_t flags, struct nvk_cbuf_map *map) {
++   struct vk_descriptor_set_layout *layouts[] = {&f->layout->vk};
++   nvk_nir_lower_descriptors(s, &f->pdev, flags, &f->rs, 1, layouts, map);
++   nir_validate_shader(s, "actual NVK lowering");
++}
++static void check(struct fixture *f, const char *name, struct options o, uint32_t debug,
++                  uint32_t flags, unsigned extra) {
++   f->pdev.debug_flags = 0;
++   nir_shader *a = make_shader(f, o), *b = nir_shader_clone(NULL, a);
++   struct nvk_cbuf_map ma = {0}, mb = {0};
++   lower(f, a, flags, &ma);
++   f->pdev.debug_flags = debug;
++   lower(f, b, flags, &mb);
++   CHECK(mb.cbuf_count == ma.cbuf_count + extra);
++   CHECK(memcmp(ma.cbufs, mb.cbufs, ma.cbuf_count * sizeof(ma.cbufs[0])) == 0);
++   if (extra)
++      CHECK(count_loads(b) == count_loads(a) + o.loads);
++   else {
++      struct blob ba, bb;
++      blob_init(&ba);
++      blob_init(&bb);
++      nir_serialize(&ba, a, true);
++      nir_serialize(&bb, b, true);
++      CHECK(ba.size == bb.size && memcmp(ba.data, bb.data, ba.size) == 0);
++      blob_finish(&ba);
++      blob_finish(&bb);
++   }
++   ralloc_free(a);
++   ralloc_free(b);
++   printf("PASS %s\n", name);
++}
++static void compiler_check(struct fixture *f, struct options o) {
++   struct nvk_shader *sh[2];
++   for (unsigned on = 0; on < 2; on++) {
++      f->pdev.debug_flags = on ? NVK_DEBUG_GM107_UBO_CBUF : 0;
++      nir_shader *nir = make_shader(f, o);
++      nvk_device_shader_ops.preprocess_nir(&f->pdev.vk, nir, &f->rs);
++      struct vk_descriptor_set_layout *layouts[] = {&f->layout->vk};
++      struct vk_shader_compile_info info = {.stage = o.stage,
++                                            .nir = nir,
++                                            .robustness = &f->rs,
++                                            .flags = VK_SHADER_CREATE_NO_TASK_SHADER_BIT_EXT,
++                                            .set_layout_count = 1,
++                                            .set_layouts = layouts};
++      struct vk_shader *out;
++      CHECK(nvk_device_shader_ops.compile(&f->dev.vk, 1, &info, NULL, NULL, NULL, &out) ==
++            VK_SUCCESS);
++      sh[on] = container_of(out, struct nvk_shader, vk);
++      CHECK(sh[on]->code_size > 0);
++   }
++   CHECK(sh[1]->cbuf_map.cbuf_count == sh[0]->cbuf_map.cbuf_count + 1);
++   printf("PASS SM50 compilation: off %u instructions/%u GPR, on %u instructions/%u GPR; not GPU "
++          "performance\n",
++          sh[0]->info.num_instrs, sh[0]->info.num_gprs, sh[1]->info.num_instrs,
++          sh[1]->info.num_gprs);
++   for (unsigned i = 0; i < 2; i++)
++      sh[i]->vk.ops->destroy(&f->dev.vk, &sh[i]->vk, NULL);
++}
++int main(void) {
++   glsl_type_singleton_init_or_ref();
++   struct fixture f = {0};
++   f.pdev.info = (struct nv_device_info){
++       .chipset = 0x117, .sm = 50, .cls_eng3d = MAXWELL_A, .max_warps_per_mp = 64};
++   f.pdev.vk.instance = &f.instance.vk;
++   f.pdev.nak = nak_compiler_create(&f.pdev.info);
++   CHECK(f.pdev.nak);
++   f.dev.vk.physical = &f.pdev.vk;
++   f.dev.vk.alloc = *vk_default_allocator();
++   f.dev.vk.base.type = VK_OBJECT_TYPE_DEVICE;
++   f.rs = (struct vk_pipeline_robustness_state){
++       .uniform_buffers = VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT,
++       .storage_buffers = VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT,
++       .images = VK_PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_ROBUST_IMAGE_ACCESS_2_EXT};
++   const struct options normal = {.loads = 8, .ordinary = 1, .stage = MESA_SHADER_FRAGMENT};
++   const unsigned on = NVK_DEBUG_GM107_UBO_CBUF;
++   struct options o;
++   check(&f, "off", normal, 0, 0, 0);
++   check(&f, "C0 only", normal, NVK_DEBUG_GM107_UBO_DIAG, 0, 0);
++   check(&f, "eight reads", normal, on, 0, 1);
++   check(&f, "no_cbuf precedence", normal, on | NVK_DEBUG_NO_CBUF, 0, 0);
++   f.pdev.info.chipset = 0x120;
++   check(&f, "other GPU", normal, on, 0, 0);
++   f.pdev.info.chipset = 0x117;
++#define CASE(name, field, value, extra)                                                            \
++   o = normal;                                                                                     \
++   o.field = value;                                                                                \
++   check(&f, name, o, on, 0, extra)
++   CASE("seven reads", loads, 7, 0);
++   CASE("vertex", stage, MESA_SHADER_VERTEX, 0);
++   CASE("compute", stage, MESA_SHADER_COMPUTE, 0);
++   CASE("constant array index", index, 1, 1);
++   CASE("out-of-layout index", index, 2, 0);
++   CASE("dynamic index", dynamic_index, true, 0);
++   CASE("dynamic offset", dynamic_offset, true, 0);
++   CASE("mixed offset", mixed, true, 0);
++   CASE("mutable", mutable, true, 0);
++   CASE("push", push, true, 1);
++   CASE("outside window", offset, NVK_MAX_CBUF_SIZE, 0);
++   CASE("last valid window", offset, NVK_MAX_CBUF_SIZE - 128, 1);
++   CASE("only one extra", ordinary, 2, 1);
++   CASE("preserve dynamic slots", dynamic, 2, 1);
++   CASE("full map", dynamic, 15, 0);
++   check(&f, "indirect bind", normal, on, VK_SHADER_CREATE_INDIRECT_BINDABLE_BIT_EXT, 0);
++   f.rs.uniform_buffers = VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2_EXT;
++   check(&f, "robust2", normal, on, 0, 0);
++   f.rs.uniform_buffers = VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT;
++   f.pdev.debug_flags = 0;
++   uint64_t flags = nvk_physical_device_compiler_flags(&f.pdev);
++   f.pdev.debug_flags = on;
++   CHECK((flags ^ nvk_physical_device_compiler_flags(&f.pdev)) == (UINT64_C(1) << 15));
++   f.pdev.info.chipset = 0x120;
++   CHECK(flags == nvk_physical_device_compiler_flags(&f.pdev));
++   f.pdev.info.chipset = 0x117;
++   f.pdev.debug_flags = on | NVK_DEBUG_NO_CBUF;
++   CHECK(!(nvk_physical_device_compiler_flags(&f.pdev) & (UINT64_C(1) << 15)));
++   puts("PASS effective cache flags");
++   compiler_check(&f, normal);
++   free(f.layout);
++   nak_compiler_destroy(f.pdev.nak);
++   glsl_type_singleton_decref();
++   return 0;
++}
