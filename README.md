@@ -6,11 +6,11 @@
 > Первый патч: [`gm107-command-cache.patch`](gm107-command-cache.patch). Его исходная, историческая документация: [`README_RU.md`](README_RU.md).
 > Следующий этап: [анализ исходников и проект H2](docs/NEXT_PATCH.md), [A/B-протокол](docs/AB_PROTOCOL.md), [проверки инструментов](docs/VALIDATION_V2_PLAN.md).
 
-## Следующий патч: проект H2
+## Второй патч: реализация H2
 
 Предложено избирательно разрешить продвижение одного часто читаемого UBO с постоянными смещениями во фрагментном шейдере GM107 в аппаратный constant buffer. В текущей базе NVK обычные UBO исключены из этого пути на GPU до Turing из-за стоимости indirect binding. Гипотеза: на тяжёлых fragment workloads экономия shader instructions может окупить привязку.
 
-**H2 пока не реализован и не собран.** Подготовлен конкретный план по функциям Mesa, тестам correctness, shader cache identity и контролю регрессий. Нет доказательства, что Dota использует подходящие шейдеры: это первый проверяемый шаг. Новая библиотека будет собираться от чистого base, отдельно от v0.1.
+**H2 реализован отдельно от H1:** C0, opt-in UBO cbuf, compiler cache isolation, NIR/SM50 tests и GPU microbenchmark. См. [реализацию и команды](docs/H2_IMPLEMENTATION.md) и [проверенные результаты](logs/h2/VALIDATION.md). Используйте `build-h2-cachyos.sh`. **Применимость к Dota и прирост FPS на GTX 750 Ti пока неизвестны.**
 
 ## Что делает v0.1
 

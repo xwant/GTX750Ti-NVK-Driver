@@ -1,0 +1,292 @@
+[
+  {
+    "args": [
+      "--reads",
+      "1"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "1",
+      "--dynamic"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "1",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "1",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch",
+      "--push"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "4"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "4",
+      "--dynamic"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "4",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "4",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch",
+      "--push"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "7"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "7",
+      "--dynamic"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "7",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "7",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch",
+      "--push"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "8"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "8",
+      "--dynamic"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "8",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "8",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch",
+      "--push"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "16"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "16",
+      "--dynamic"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "16",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "16",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch",
+      "--push"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--dynamic"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--draws",
+      "8",
+      "--rebind",
+      "--switch",
+      "--push"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--robust2"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--null"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--oob"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--null",
+      "--push"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--null-only"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--null-only",
+      "--push"
+    ],
+    "exit": 0
+  },
+  {
+    "args": [
+      "--reads",
+      "32",
+      "--oob",
+      "--dynamic",
+      "--draws",
+      "8",
+      "--rebind"
+    ],
+    "exit": 0
+  }
+]

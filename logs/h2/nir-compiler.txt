@@ -1,0 +1,25 @@
+NVK_GM107_UBO {"schema":1,"event":"compile","nir":"fdcb94fdc0d0462e962f55e66dd58495154ce5b25ebf0255a9f41a703d529b86","loads":8,"unknown_loads":0,"dynamic_ubo_loads":0,"eligible":1,"available":true,"selected":-1,"robust2":false,"candidates":[{"set":0,"descriptor_offset":0,"uses":8,"reject":0}]}
+PASS off
+PASS C0 only
+PASS eight reads
+PASS no_cbuf precedence
+PASS other GPU
+PASS seven reads
+PASS vertex
+PASS compute
+PASS constant array index
+PASS out-of-layout index
+PASS dynamic index
+PASS dynamic offset
+PASS mixed offset
+PASS mutable
+PASS push
+PASS outside window
+PASS last valid window
+PASS only one extra
+PASS preserve dynamic slots
+PASS full map
+PASS indirect bind
+PASS robust2
+PASS effective cache flags
+PASS SM50 compilation: off 100 instructions/24 GPR, on 10 instructions/24 GPR; not GPU performance

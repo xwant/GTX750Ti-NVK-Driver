@@ -1,0 +1,10 @@
+1/5 nouveau - mesa:nil           OK              0.00s   1 subtests passed
+2/5 nouveau - mesa:nak           OK              0.01s   9 subtests passed
+3/5 nouveau - mesa:nvk_mme       OK              0.00s
+4/5 nouveau - mesa:mme_builder   OK              0.01s
+5/5 nouveau - mesa:nvk_gm107_ubo OK              0.01s
+
+Ok:                5   
+Fail:              0   
+
+Full log written to /workspace/scratch/908399f6f132/mesa/build-h2/meson-logs/testlog.txt
