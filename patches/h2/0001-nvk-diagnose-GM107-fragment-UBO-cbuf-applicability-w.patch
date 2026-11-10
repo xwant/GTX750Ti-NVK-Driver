@@ -1,0 +1,284 @@
+From 6211d7fbc01af4f329ce6155334de3a519da91b8 Mon Sep 17 00:00:00 2001
+From: Codex <codex@example.invalid>
+Date: Tue, 10 Nov 2026 14:56:25 +0100
+Subject: [PATCH] nvk: diagnose GM107 fragment UBO cbuf applicability without
+ changing lowering
+
+---
+ src/nouveau/vulkan/nvk_debug.h                |   1 +
+ src/nouveau/vulkan/nvk_instance.c             |   1 +
+ .../vulkan/nvk_nir_lower_descriptors.c        | 113 +++++++++++++++++-
+ src/nouveau/vulkan/nvk_shader.c               |   7 ++
+ 4 files changed, 118 insertions(+), 4 deletions(-)
+
+diff --git a/src/nouveau/vulkan/nvk_debug.h b/src/nouveau/vulkan/nvk_debug.h
+index 169b6d9c..39065697 100644
+--- a/src/nouveau/vulkan/nvk_debug.h
++++ b/src/nouveau/vulkan/nvk_debug.h
+@@ -45,6 +45,7 @@ enum nvk_debug {
+ 
+    /* Disable image compression */
+    NVK_DEBUG_NO_COMPRESSION = 1ull << 9,
++   NVK_DEBUG_GM107_UBO_DIAG = 1ull << 10,
+ };
+ 
+ enum nvk_experimental {
+diff --git a/src/nouveau/vulkan/nvk_instance.c b/src/nouveau/vulkan/nvk_instance.c
+index 1a5f7eaa..484def37 100644
+--- a/src/nouveau/vulkan/nvk_instance.c
++++ b/src/nouveau/vulkan/nvk_instance.c
+@@ -89,6 +89,7 @@ nvk_init_debug_flags(struct nvk_instance *instance)
+       { "trash_memory", NVK_DEBUG_TRASH_MEMORY },
+       { "vm", NVK_DEBUG_VM },
+       { "no_cbuf", NVK_DEBUG_NO_CBUF },
++      { "gm107_ubo_diag", NVK_DEBUG_GM107_UBO_DIAG },
+       { "edb_bview", NVK_DEBUG_FORCE_EDB_BVIEW },
+       { "gart", NVK_DEBUG_FORCE_GART },
+       { "coherent", NVK_DEBUG_FORCE_COHERENT },
+diff --git a/src/nouveau/vulkan/nvk_nir_lower_descriptors.c b/src/nouveau/vulkan/nvk_nir_lower_descriptors.c
+index 93614027..e4a92c75 100644
+--- a/src/nouveau/vulkan/nvk_nir_lower_descriptors.c
++++ b/src/nouveau/vulkan/nvk_nir_lower_descriptors.c
+@@ -11,6 +11,9 @@
+ 
+ #include "nir_builder.h"
+ #include "nir_deref.h"
++#include "nir_serialize.h"
++#include "util/blob.h"
++#include "util/mesa-blake3.h"
+ 
+ #include "clb097.h"
+ #include "clc397.h"
+@@ -23,6 +26,7 @@ struct lower_desc_cbuf {
+ 
+    uint64_t start;
+    uint64_t end;
++   uint32_t gm107_reject; /* 1: type, 2: dynamic offset, 4: range */
+ };
+ 
+ DERIVE_HASH_TABLE(nvk_cbuf);
+@@ -66,6 +70,9 @@ struct lower_descriptors_ctx {
+ 
+    struct hash_table *cbufs;
+    struct nvk_cbuf_map *cbuf_map;
++   bool gm107_analyze, gm107_diag, gm107_no_cbuf, gm107_robust2;
++   uint32_t gm107_loads, gm107_unknown, gm107_dynamic_ubos;
++   char gm107_hash[BLAKE3_HEX_LEN];
+ };
+ 
+ static bool
+@@ -92,7 +99,7 @@ descriptor_type_is_ssbo(nir_descriptor_type desc_type)
+    }
+ }
+ 
+-static void
++static struct lower_desc_cbuf *
+ record_cbuf_use(const struct nvk_cbuf *key, uint64_t start, uint64_t end,
+                 struct lower_descriptors_ctx *ctx)
+ {
+@@ -102,6 +109,7 @@ record_cbuf_use(const struct nvk_cbuf *key, uint64_t start, uint64_t end,
+       cbuf->use_count++;
+       cbuf->start = MIN2(cbuf->start, start);
+       cbuf->end = MAX2(cbuf->end, end);
++      return cbuf;
+    } else {
+       struct lower_desc_cbuf *cbuf =
+          ralloc(ctx->cbufs, struct lower_desc_cbuf);
+@@ -112,9 +120,36 @@ record_cbuf_use(const struct nvk_cbuf *key, uint64_t start, uint64_t end,
+          .end = end,
+       };
+       _mesa_hash_table_insert(ctx->cbufs, &cbuf->key, cbuf);
++      return cbuf;
+    }
+ }
+ 
++/* Require constant byte offsets separately from upstream bounded-range analysis. */
++static uint32_t
++gm107_check_offset(nir_deref_instr *deref)
++{
++   const uint64_t size = glsl_get_explicit_size(deref->type, false);
++   uint64_t offset = 0;
++   while (deref->deref_type != nir_deref_type_cast) {
++      uint64_t add;
++      if (deref->deref_type == nir_deref_type_array && nir_src_is_const(deref->arr.index)) {
++         uint64_t index = nir_src_as_uint(deref->arr.index);
++         uint64_t stride = nir_deref_instr_array_stride(deref);
++         if (stride && index > UINT64_MAX / stride) return 4;
++         add = index * stride;
++      } else if (deref->deref_type == nir_deref_type_struct) {
++         add = glsl_get_struct_field_offset(nir_deref_instr_parent(deref)->type, deref->strct.index);
++      } else {
++         return 2;
++      }
++      if (add > UINT64_MAX - offset) return 4;
++      offset += add;
++      deref = nir_deref_instr_parent(deref);
++   }
++   return size == 0 || size > NVK_MAX_CBUF_SIZE ||
++          offset > NVK_MAX_CBUF_SIZE - size ? 4 : 0;
++}
++
+ static const struct nvk_descriptor_set_binding_layout *
+ get_binding_layout(uint32_t set, uint32_t binding,
+                    const struct lower_descriptors_ctx *ctx)
+@@ -345,8 +380,20 @@ record_load_ubo_cbuf_uses(nir_deref_instr *deref,
+    struct nvk_cbuf cbuf =
+       ubo_deref_to_cbuf(deref, &res_index, &offset, &start, &end, ctx);
+ 
++   if (ctx->gm107_analyze) {
++      ctx->gm107_loads++;
++      ctx->gm107_unknown += cbuf.type == NVK_CBUF_TYPE_INVALID;
++      ctx->gm107_dynamic_ubos += cbuf.type == NVK_CBUF_TYPE_DYNAMIC_UBO;
++   }
+    if (cbuf.type != NVK_CBUF_TYPE_INVALID) {
+-      record_cbuf_use(&cbuf, start, end, ctx);
++      struct lower_desc_cbuf *record = record_cbuf_use(&cbuf, start, end, ctx);
++      if (ctx->gm107_analyze && cbuf.type == NVK_CBUF_TYPE_UBO_DESC) {
++         const struct nvk_descriptor_set_binding_layout *binding =
++            get_binding_layout(nir_intrinsic_desc_set(res_index), nir_intrinsic_binding(res_index), ctx);
++         if (binding->type != VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) record->gm107_reject |= 1;
++         if (nir_src_as_uint(res_index->src[0]) >= binding->array_size) record->gm107_reject |= 4;
++         record->gm107_reject |= gm107_check_offset(deref);
++      }
+    } else if (res_index != NULL) {
+       record_vulkan_resource_cbuf_use(res_index, ctx);
+    }
+@@ -398,6 +445,40 @@ record_cbuf_uses_instr(UNUSED nir_builder *b, nir_instr *instr, void *_ctx)
+    }
+ }
+ 
++static bool
++gm107_ubo_candidate(const struct lower_desc_cbuf *c)
++{
++   return c->key.type == NVK_CBUF_TYPE_UBO_DESC && !c->gm107_reject &&
++          c->use_count >= 8 && c->end > c->start && c->end <= NVK_MAX_CBUF_SIZE;
++}
++
++static void
++gm107_report(const struct lower_descriptors_ctx *ctx,
++             const struct lower_desc_cbuf *cbufs, unsigned count, int selected)
++{
++   if (!ctx->gm107_diag) return;
++   unsigned eligible = 0;
++   for (unsigned i = 0; i < count; i++) eligible += gm107_ubo_candidate(&cbufs[i]);
++   bool available = !ctx->gm107_no_cbuf && !ctx->indirect_bind && !ctx->gm107_robust2 &&
++                    !ctx->gm107_unknown && (ctx->cbuf_map->cbuf_count < 16 || selected >= 0);
++   flockfile(stderr);
++   fprintf(stderr, "NVK_GM107_UBO {\"schema\":1,\"event\":\"compile\","
++      "\"nir\":\"%s\",\"loads\":%u,\"unknown_loads\":%u,\"dynamic_ubo_loads\":%u,"
++      "\"eligible\":%u,\"available\":%s,\"selected\":%d,\"robust2\":%s,\"candidates\":[",
++      ctx->gm107_hash, ctx->gm107_loads, ctx->gm107_unknown, ctx->gm107_dynamic_ubos,
++      eligible, available ? "true" : "false", selected, ctx->gm107_robust2 ? "true" : "false");
++   bool first = true;
++   for (unsigned i = 0; i < count; i++) {
++      const struct lower_desc_cbuf *c = &cbufs[i];
++      if (c->key.type != NVK_CBUF_TYPE_UBO_DESC) continue;
++      fprintf(stderr, "%s{\"set\":%u,\"descriptor_offset\":%u,\"uses\":%u,\"reject\":%u}",
++         first ? "" : ",", c->key.desc_set, c->key.desc_offset, c->use_count, c->gm107_reject);
++      first = false;
++   }
++   fprintf(stderr, "]}\n");
++   funlockfile(stderr);
++}
++
+ static void
+ build_cbuf_map(nir_shader *nir, struct lower_descriptors_ctx *ctx)
+ {
+@@ -415,8 +496,10 @@ build_cbuf_map(nir_shader *nir, struct lower_descriptors_ctx *ctx)
+       };
+    }
+ 
+-   if (ctx->indirect_bind)
++   if (ctx->indirect_bind) {
++      gm107_report(ctx, NULL, 0, -1);
+       return;
++   }
+ 
+    ctx->cbufs = nvk_cbuf_table_create(NULL);
+    nir_shader_instructions_pass(nir, record_cbuf_uses_instr,
+@@ -433,7 +516,7 @@ build_cbuf_map(nir_shader *nir, struct lower_descriptors_ctx *ctx)
+       /* We currently only start cbufs at the beginning so if it starts after
+        * the max cbuf size, there's no point in including it in the list.
+        */
+-      if (cbuf->start > NVK_MAX_CBUF_SIZE)
++      if (cbuf->start > NVK_MAX_CBUF_SIZE && !ctx->gm107_analyze)
+          continue;
+ 
+       cbufs[num_cbufs++] = *cbuf;
+@@ -450,6 +533,7 @@ build_cbuf_map(nir_shader *nir, struct lower_descriptors_ctx *ctx)
+    }
+ 
+    for (uint32_t i = 0; i < num_cbufs; i++) {
++      if (cbufs[i].start > NVK_MAX_CBUF_SIZE) continue;
+       if (ctx->cbuf_map->cbuf_count >= max_cbuf_bindings)
+          break;
+ 
+@@ -470,6 +554,7 @@ build_cbuf_map(nir_shader *nir, struct lower_descriptors_ctx *ctx)
+       ctx->cbuf_map->cbufs[ctx->cbuf_map->cbuf_count++] = cbufs[i].key;
+    }
+ 
++   gm107_report(ctx, cbufs, num_cbufs, -1);
+    ralloc_free(ctx->cbufs);
+    ctx->cbufs = NULL;
+ }
+@@ -1564,8 +1649,22 @@ nvk_nir_lower_descriptors(nir_shader *nir,
+       .has_task_shader = (shader_flags & VK_SHADER_CREATE_NO_TASK_SHADER_BIT_EXT) == 0,
+       .ssbo_addr_format = nvk_ssbo_addr_format(pdev, rs),
+       .ubo_addr_format = nvk_ubo_addr_format(pdev, rs),
++      .gm107_analyze = pdev->info.chipset == 0x117 && nir->info.stage == MESA_SHADER_FRAGMENT &&
++                       (pdev->debug_flags & NVK_DEBUG_GM107_UBO_DIAG),
++      .gm107_no_cbuf = pdev->debug_flags & NVK_DEBUG_NO_CBUF,
++      .gm107_robust2 = rs->uniform_buffers == VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2_EXT,
+    };
+ 
++   ctx.gm107_diag = ctx.gm107_analyze;
++   if (ctx.gm107_diag) {
++      struct blob blob;
++      uint8_t hash[BLAKE3_OUT_LEN];
++      blob_init(&blob);
++      nir_serialize(&blob, nir, true);
++      _mesa_blake3_compute(blob.data, blob.size, hash);
++      _mesa_blake3_format(ctx.gm107_hash, hash);
++      blob_finish(&blob);
++   }
+    assert(set_layout_count <= NVK_MAX_SETS);
+    for (uint32_t s = 0; s < set_layout_count; s++) {
+       if (set_layouts[s] != NULL)
+@@ -1589,6 +1688,12 @@ nvk_nir_lower_descriptors(nir_shader *nir,
+     */
+ 
+    bool pass_lower_ubo = false;
++   if (cbuf_map_out == NULL && ctx.gm107_diag) {
++      struct nvk_cbuf_map diagnostic_map;
++      ctx.cbuf_map = &diagnostic_map;
++      build_cbuf_map(nir, &ctx);
++      ctx.cbuf_map = NULL;
++   }
+    if (cbuf_map_out != NULL) {
+       ctx.cbuf_map = cbuf_map_out;
+       build_cbuf_map(nir, &ctx);
+diff --git a/src/nouveau/vulkan/nvk_shader.c b/src/nouveau/vulkan/nvk_shader.c
+index 6f649f85..709876e4 100644
+--- a/src/nouveau/vulkan/nvk_shader.c
++++ b/src/nouveau/vulkan/nvk_shader.c
+@@ -80,6 +80,8 @@ nvk_physical_device_compiler_flags(const struct nvk_physical_device *pdev)
+    return (no_cbufs ? 1 << 12 : 0)
+       | (use_edb_buffer_views ? 1 << 13 : 0)
+       | (instance->drirc.misc.ssbo_align_4b ? 1 << 14 : 0)
++      | ((pdev->info.chipset == 0x117 &&
++          (pdev->debug_flags & NVK_DEBUG_GM107_UBO_DIAG)) ? UINT64_C(1) << 16 : 0)
+       | (nak_flags << 48);
+ }
+ 
+@@ -1267,6 +1269,11 @@ nvk_deserialize_shader(struct vk_device *vk_dev,
+ 
+    struct nvk_cbuf_map cbuf_map;
+    blob_copy_bytes(blob, &cbuf_map, sizeof(cbuf_map));
++   struct nvk_physical_device *pdev = nvk_device_physical(dev);
++   if (!blob->overrun && pdev->info.chipset == 0x117 &&
++       (pdev->debug_flags & NVK_DEBUG_GM107_UBO_DIAG) &&
++       info.stage == MESA_SHADER_FRAGMENT)
++      fprintf(stderr, "NVK_GM107_UBO {\"schema\":1,\"event\":\"cache_hit\"}\n");
+ 
+    bool sample_shading_enable;
+    blob_copy_bytes(blob, &sample_shading_enable, sizeof(sample_shading_enable));
