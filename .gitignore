@@ -26,3 +26,6 @@ logs/options-patched.json
 __pycache__/
 *.pyc
 bench/results/
+
+# Private H2 source trees, caches, logs and binaries
+work-h2/
