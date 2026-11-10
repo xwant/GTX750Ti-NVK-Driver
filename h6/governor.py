@@ -51,19 +51,18 @@ class Governor:
                       math.isfinite(busy) and 0 <= busy <= 100)
         supported = gpu == "GM107" and driver == "nouveau"
         trusted_sensor = trusted is True and valid_busy
-        healthy = supported and valid_temp and temp < self.cfg.thermal_down_temp_c
-
-        # Fail-closed: unknown model/driver, temperature, or trusted load -> low.
-        if not healthy or not trusted_sensor:
-            self._switch(self.cfg.low_state, t)
-            self._clear_intent()
-            return self._report("safety_fallback", t)
-
-        # Hardware thermal safeguard always takes precedence over cooldowns.
-        if temp >= self.cfg.thermal_down_temp_c:
+        # High temperature must be evaluated before generic missing-data fallback.
+        # Neither path can issue a clock increase.
+        if supported and valid_temp and temp >= self.cfg.thermal_down_temp_c:
             self._switch(self.cfg.low_state, t)
             self._clear_intent()
             return self._report("thermal_down", t)
+
+        # Fail-closed: unknown model/driver, temperature, or trusted load -> low.
+        if not supported or not valid_temp or not trusted_sensor:
+            self._switch(self.cfg.low_state, t)
+            self._clear_intent()
+            return self._report("safety_fallback", t)
 
         if active is True and busy >= self.cfg.busy_up_pct and temp <= self.cfg.min_boost_temp_c:
             desired = self.cfg.high_state
