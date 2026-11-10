@@ -43,3 +43,35 @@ python3 h6/governor.py h6/example.jsonl
 The existing NVIDIA boot is the recovery path; do not modify bootloader, kernel parameters, or installed drivers.
 
 Reference: ArchWiki Nouveau power management documents experimental debugfs reclocking and warns about hangs/overheating. Other projects' Kepler-specific PMU access is not transferable directly to GM107.
+
+
+## Future goal: percentage-based adaptive boost (NOT implemented)
+
+User experience: display a **requested core-clock multiplier** and measured actual clocks, e.g. 100%, 103%, 106%. The multiplier is defined relative to a clearly recorded stock reference core clock for the same GPU/BIOS and temperature regime, not a multiplier on FPS or a percentage of GPU utilization. A percentage is only a **requested target**, never proof that the hardware attained it.
+
+Two separate capabilities must not be conflated:
+- **Stock adaptive mode:** dynamically choose among validated board-defined Nouveau P-states; this is the only potential near-term hardware control path. Available states are discrete, so a smooth percentage slider may not be achievable, and display should reflect actual states/clocks.
+- **Beyond-stock overclocking:** frequencies above validated factory clocks. This requires independent GM107-specific kernel/firmware/clock-control capability research, hardware stability testing, voltage/power/current and thermal protections; do not imply such capability exists in NVK or current Nouveau. No overclock actuator is authorized by this plan.
+
+### Desired control strategy
+
+1. User explicitly opts in, selects a performance target (e.g. frame-time budget) and a **maximum verified, supported multiplier**. Startup remains monitoring-only.
+2. Identify a **GPU-bound** shortfall using trustworthy GPU telemetry and consistent frame-time evidence; low FPS alone may be a CPU bottleneck. The previously observed KDE 0% GPU reading is not reliable.
+3. When headroom and GPU-bound demand persist, request one *verified supported* higher state at a time, with ramp-rate limits, minimum dwell time and hysteresis. Never blindly interpolate or synthesize hardware clock frequencies.
+4. Confirm actual clocks and telemetry after each attempted change; reject ineffective or unstable changes.
+5. Decrease the target on temperature rise, power/current limits, unstable clocks, repeated errors, faults, missing fan/sensor data, or lack of GPU-bound benefit. Losing telemetry disables boosts; restoration is not an excuse to instantaneously jump back to a high state.
+6. Recover to a validated conservative state on application exit or controller termination when technically possible; hard GPU hangs may require reboot.
+
+### Safety contract
+
+Temperature alone is **not** a safe overclock boundary. Board limits, VRM/memory temperatures (often unavailable), power delivery, voltage, cooling/fan behavior, silicon variability and driver support also matter. Software thresholds are policy safeguards, not a hardware safety guarantee. Until device-specific validation, there is no universal "safe temperature" or safe maximum percentage for this card; never manufacture these values.
+
+Do not write kernel parameters, firmware, voltages, fan curves, power limits or arbitrary clocks as part of H6 Phase 0. Never combine frequency experiments with H2/H3 performance tests when trying to attribute FPS changes to compiler optimizations.
+
+### Implementation milestones
+
+- H6.1: Pure policy simulation (current) choosing conservative existing P-state IDs, with tests.
+- H6.2: Add an **abstract percent-target planning mode** and CPU-only trace-based tests; output recommendations only.
+- H6.3: Separate read-only GM107 telemetry collector and evidence-grade GPU-bottleneck detector, with explicit sensor-quality states.
+- H6.4: Explicitly opted-in *stock P-state* actuator only after supervised hardware acceptance and recovery validation.
+- H6.5: Research *possible* beyond-stock clock control as a separate proposal; do not implement an overclock actuator without proving hardware capability and validating board-specific safeguards.
