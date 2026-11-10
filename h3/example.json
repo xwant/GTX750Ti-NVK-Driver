@@ -1,0 +1,43 @@
+[
+  {
+    "gpu": "GM107",
+    "mesa_commit": "synthetic",
+    "compiler_flags": "synthetic",
+    "shader_sha256": "synthetic-shader",
+    "layout_sha256": "synthetic-layout",
+    "pairs": [
+      {
+        "base_ns": 1000,
+        "h2_ns": 900
+      },
+      {
+        "base_ns": 1000,
+        "h2_ns": 900
+      },
+      {
+        "base_ns": 1000,
+        "h2_ns": 900
+      },
+      {
+        "base_ns": 1000,
+        "h2_ns": 900
+      },
+      {
+        "base_ns": 1000,
+        "h2_ns": 900
+      },
+      {
+        "base_ns": 1000,
+        "h2_ns": 900
+      },
+      {
+        "base_ns": 1000,
+        "h2_ns": 900
+      },
+      {
+        "base_ns": 1000,
+        "h2_ns": 900
+      }
+    ]
+  }
+]
