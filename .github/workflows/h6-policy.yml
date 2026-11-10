@@ -1,0 +1,27 @@
+name: H6 policy (simulation)
+
+on:
+  push:
+    branches:
+      - experiment/h6-gm107-adaptive-boost
+    paths:
+      - h6/**
+      - .github/workflows/h6-policy.yml
+  pull_request:
+    paths:
+      - h6/**
+      - .github/workflows/h6-policy.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python unit tests
+        run: python3 -m unittest discover -s h6 -p 'test_*.py' -v
+      - name: Offline trace replay
+        run: python3 h6/governor.py h6/example.jsonl
