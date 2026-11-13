@@ -32,3 +32,5 @@ Synthetic generator creates 48 records, 16 pairs/record, 30 samples/arm; fixed s
 The t-style H3 bound (mean log ratio + 2.5 SEM) is retained for comparison, not claimed as calibrated statistical coverage. Synthetic traces are correlated toy data. A production decision needs real paired data, independent holdouts, multiple-comparison control and confidence calibration.
 
 Hardware and dependency blocks: no physical GPU, CachyOS or server; extracted Mesa build toolchain is unavailable in this session. No new C driver changes were made during the tooling audit. Actual GM107 correctness, pipeline-cache persistence, CTS, WSI, actual game quality/hotness, latency/FPS, power/thermal stability and future C overhead remain untested.
+
+Additional compatibility regressions reject mixed driver builds in one research experiment and changing libraries within a capture. A test using explicitly fake recorded hardware metadata exercises the import success path and its consistency checks; it is a parser fixture in a temporary directory and is never an observed GPU dataset.

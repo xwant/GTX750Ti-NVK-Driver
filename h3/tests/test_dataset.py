@@ -118,3 +118,28 @@ class ImportTests(unittest.TestCase):
             r=subprocess.run([sys.executable,'-m','h3.dataset','decisions',str(out)],capture_output=True,text=True)
             self.assertEqual(r.returncode,0,r.stderr);table=json.loads(r.stdout)
             self.assertFalse(table['driver_ready']);self.assertEqual(table['entries'][0]['scope'],'microbenchmark')
+
+class CompatibilityTests(unittest.TestCase):
+    def test_hardware_requires_matching_off_on_binaries(self):
+        r=record();r['origin']='hardware';r['identity']['gpu']='GM107';r['provenance']['gpu_verified']=True
+        r['identity']['driver_identities']['on']=d.digest('different build')
+        with self.assertRaises(d.Invalid):d.build([r])
+        r['identity']['driver_identities']['on']=None
+        with self.assertRaises(d.Invalid):d.build([r])
+    def test_hardware_import_preserves_build_and_rejects_mid_capture_change(self):
+        # Fake recorded-device/library evidence exercises parsing only; it is
+        # never exported as a measured hardware dataset or GPU-test result.
+        with tempfile.TemporaryDirectory() as tmp:
+            summary,manifest=h2_fixture(tmp);meta=json.loads(manifest.read_text())
+            meta.update(origin='hardware',gpu='GM107');manifest.write_text(json.dumps(meta))
+            lib=d.digest('test library bytes')
+            for run in Path(tmp).glob('case-*'):
+                stderr=run/'stderr.txt';stderr.write_text(stderr.read_text()+'DEVICE GTX 750 Ti software=0\nMAPPING /recorded/libvulkan_nouveau.so\n')
+                (run/'verification.json').write_text(json.dumps(dict(status='verified',library='/recorded/libvulkan_nouveau.so',sha256=lib)))
+                (run/'library-h2.sha256').write_text(lib+'  /recorded/libvulkan_nouveau.so\n')
+            record=d.import_h2(summary,tmp,manifest)['records'][0]
+            self.assertEqual(record['identity']['driver_identities'],dict(off=lib,on=lib))
+            run=Path(tmp)/'case-7-on';other=d.digest('different library bytes')
+            (run/'verification.json').write_text(json.dumps(dict(status='verified',library='/recorded/libvulkan_nouveau.so',sha256=other)))
+            (run/'library-h2.sha256').write_text(other+'  /recorded/libvulkan_nouveau.so\n')
+            with self.assertRaises(d.Invalid):d.import_h2(summary,tmp,manifest)

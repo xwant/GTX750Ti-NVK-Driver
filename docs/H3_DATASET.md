@@ -39,3 +39,5 @@ python3 -m h3.research /tmp/synthetic.json --out /tmp/research.json
 ```
 
 The first command invents values with an explicit synthetic label to exercise software. No generated nanosecond value is an observed GPU timing. `build INPUT... --out DATASET` merges validated datasets, rejecting reused identities/runs. Eight pairs suffice for descriptive statistics; research evaluation needs **16** to reserve independent calibration/evaluation halves.
+
+Driver build compatibility is explicit in `identity.driver_identities`, keyed by the two compared modes. Hardware values must be SHA-256 identities; off/on must identify the **same binary**, and each policy's identity must stay constant across pairs. Unavailable software/synthetic identities may be null. Research also requires identical benchmark and driver-build identities across the compared scenarios; a common Mesa baseline alone does not establish comparability. Hardware import cross-checks recorded verification/checksum artifacts. These checks enforce consistency of supplied evidence, not external attestation of a device.

@@ -44,3 +44,7 @@ class ResearchTests(unittest.TestCase):
                                  layout_sha256=digest('layout'+str(i)),compiler_identity=digest('compiler'))
         train,test=grouped_split(rows)
         self.assertEqual(rows[0] in train,rows[1] in train)
+    def test_mixed_driver_builds_rejected(self):
+        from h3.dataset import digest
+        a=dataset();a['records'][0]['identity']['driver_identities']['on']=digest('another build')
+        with self.assertRaises(Invalid):experiment(a)

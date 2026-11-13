@@ -10,7 +10,7 @@ def record(index=0, ratio=0.9, pairs=16):
     f.update(requested_ubo_reads=reads,static_ubo_loads=reads,draws=draws,stage='fragment',
              descriptor_class='ordinary',access='constant',cbuf_bytes=1024,h2_eligible=reads>=8)
     r=dict(kind='microbenchmark',origin='synthetic',
-           identity=dict(scenario_group=group,gpu='synthetic-GM107-model',mesa_commit=MESA,policy_a='off',policy_b='on',benchmark_sha256=digest('synthetic generator v1'),config=dict(reads=reads,draws=draws,synthetic_case=index)),
+           identity=dict(scenario_group=group,gpu='synthetic-GM107-model',mesa_commit=MESA,policy_a='off',policy_b='on',benchmark_sha256=digest('synthetic generator v1'),driver_identities=dict(off=digest('synthetic driver'),on=digest('synthetic driver')),config=dict(reads=reads,draws=draws,synthetic_case=index)),
            provenance=dict(collector='synthetic generator v1',artifacts=[dict(name='generator',sha256=digest('synthetic generator v1'))],gpu_verified=False,correctness_passed=True,order_source='synthetic_generator'),features=f,pairs=[])
     for i in range(pairs):
         a=[1000+((index*7+i*3+j)%11) for j in range(30)]

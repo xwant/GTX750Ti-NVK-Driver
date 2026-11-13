@@ -77,7 +77,7 @@ def predict(tree, features):
 
 def experiment(dataset, seed=750):
     records=validate(dataset)['records']
-    require(records and len({(r['kind'],r['origin'],r['identity']['policy_a'],r['identity']['policy_b']) for r in records})==1,'compare one origin, scope and policy pair at a time')
+    require(records and len({(r['kind'],r['origin'],r['identity']['policy_a'],r['identity']['policy_b'],r['identity']['mesa_commit'],r['identity']['benchmark_sha256'],digest(r['identity']['driver_identities'])) for r in records})==1,'compare one origin, scope, benchmark and driver-build pair at a time')
     require(all(r['identity']['policy_a']=='off' and r['identity']['policy_b']=='on' for r in records),'research requires off/on comparison')
     require(all(len(r['pairs'])>=16 for r in records),'need 16 pairs: 8 calibration + >=8 held-out')
     train,test=grouped_split(records,seed);tree=fit(train)

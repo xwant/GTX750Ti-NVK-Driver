@@ -2,6 +2,8 @@ test_cache_identity_and_compatibility (test_contract.ContractTests.test_cache_id
 test_eligibility_and_absence_fallback (test_contract.ContractTests.test_eligibility_and_absence_fallback) ... ok
 test_invalid_tables (test_contract.ContractTests.test_invalid_tables) ... ok
 test_missing_identity (test_contract.ContractTests.test_missing_identity) ... ok
+test_hardware_import_preserves_build_and_rejects_mid_capture_change (test_dataset.CompatibilityTests.test_hardware_import_preserves_build_and_rejects_mid_capture_change) ... ok
+test_hardware_requires_matching_off_on_binaries (test_dataset.CompatibilityTests.test_hardware_requires_matching_off_on_binaries) ... ok
 test_bad_numbers (test_dataset.DatasetTests.test_bad_numbers) ... ok
 test_cli_roundtrip (test_dataset.DatasetTests.test_cli_roundtrip) ... ok
 test_deterministic_sort (test_dataset.DatasetTests.test_deterministic_sort) ... ok
@@ -17,12 +19,13 @@ test_reject_incomplete_corrupt_and_origin (test_dataset.ImportTests.test_reject_
 test_evaluation_does_not_train_tree (test_research.ResearchTests.test_evaluation_does_not_train_tree) ... ok
 test_insufficient_or_mixed_data (test_research.ResearchTests.test_insufficient_or_mixed_data) ... ok
 test_missing_feature_fallback (test_research.ResearchTests.test_missing_feature_fallback) ... ok
+test_mixed_driver_builds_rejected (test_research.ResearchTests.test_mixed_driver_builds_rejected) ... ok
 test_permuted_input (test_research.ResearchTests.test_permuted_input) ... ok
 test_reproducible (test_research.ResearchTests.test_reproducible) ... ok
 test_same_shader_different_layouts_stay_together (test_research.ResearchTests.test_same_shader_different_layouts_stay_together) ... ok
 test_shader_or_scenario_connected_groups (test_research.ResearchTests.test_shader_or_scenario_connected_groups) ... ok
 
 ----------------------------------------------------------------------
-Ran 23 tests in 1.817s
+Ran 26 tests in 1.939s
 
 OK
