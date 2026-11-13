@@ -41,8 +41,8 @@ CPU-only local validation used the pinned Mesa tree, Rust 1.85.1 and LLVM/Clang 
 
 | Check | Result | Proves / does not prove |
 |---|---|---|
-| `python3 -m unittest discover -s h3/tests -v` | 35 PASS | Dataset/research/contract + strict telemetry import and sysfs preflight fixtures; not GPU correctness |
-| Same command with `python3 -O` | 35 PASS | Checks remain active without assertions; not device behavior |
+| `python3 -m unittest discover -s h3/tests -v` | 36 PASS | Dataset/research/contract + strict telemetry import and sysfs preflight fixtures; not GPU correctness |
+| Same command with `python3 -O` | 36 PASS | Checks remain active without assertions; not device behavior |
 | `python3 -m unittest discover -s h3 -p test_autotune.py -v` | 8 PASS | Phase 0 compatibility; no real training data |
 | Audited H2 `python3 [-O] -m unittest discover -s bench/h2 -p 'test_*.py' -v` | 15 PASS in each mode | Existing capture/parser regressions remain covered |
 | `meson test -C BUILD --suite nouveau --print-errorlogs -j 4` | base 5/5, H2 6/6, H3 6/6, H2+H3 7/7 | Includes external codegen probe; NAK software tests skip hardware/nvdisasm tests explicitly |
@@ -70,3 +70,5 @@ During implementation, a generic NIR offset helper was found to count scalar siz
 Hardware handoff: [HARDWARE_VALIDATION.md](HARDWARE_VALIDATION.md).
 
 First hosted CI run exposed a missing explicit `spirv-tools` development dependency in the container recipe; local builds already had it. The recipe now installs it. Artifact paths use a workspace-relative `_build` directory so container and host runner paths cannot diverge. These are CI-environment fixes, not GPU results.
+
+The next hosted run completed shader builds/tests but failed on Git's ownership guard during final metadata collection: the container sees the host runner uid on the checkout. `ci/git_revision.sh` now scopes `safe.directory` to that exact checkout for a single read; it does not change global Git settings or trust arbitrary directories. A real temporary Git repository tested with `GIT_TEST_ASSUME_DIFFERENT_OWNER=1` verifies that the control fails and the scoped metadata read succeeds. H3 Python coverage is now 36 tests.

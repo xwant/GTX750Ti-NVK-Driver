@@ -1,3 +1,4 @@
+test_revision_on_mount_with_different_owner (test_ci.ContainerMetadataTests.test_revision_on_mount_with_different_owner) ... ok
 test_cache_identity_and_compatibility (test_contract.ContractTests.test_cache_identity_and_compatibility) ... ok
 test_eligibility_and_absence_fallback (test_contract.ContractTests.test_eligibility_and_absence_fallback) ... ok
 test_invalid_tables (test_contract.ContractTests.test_invalid_tables) ... ok
@@ -35,6 +36,6 @@ test_provenance (test_telemetry.TelemetryTests.test_provenance) ... ok
 test_valid_static_only (test_telemetry.TelemetryTests.test_valid_static_only) ... ok
 
 ----------------------------------------------------------------------
-Ran 35 tests in 2.178s
+Ran 36 tests in 1.774s
 
 OK

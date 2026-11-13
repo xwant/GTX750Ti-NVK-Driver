@@ -7,7 +7,7 @@
     "h3": 6,
     "h2_h3": 7
   },
-  "h3_unit_tests": 35,
+  "h3_unit_tests": 36,
   "h3_phase0_tests": 8,
   "h2_audit_unit_tests": 15,
   "optimized_python": "PASS",

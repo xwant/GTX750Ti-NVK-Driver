@@ -57,7 +57,7 @@ if [[ "$variant" == h2* ]]; then
   cmp "$work/codegen-policy-on.txt" "$work/codegen-policy-diag.txt"
  fi
 fi
-{ git -C "$root" rev-parse HEAD; git -C "$work/mesa" diff --cached | sha256sum; cc --version; rustc --version; meson --version; } > "$work/environment.txt"
+{ bash "$root/ci/git_revision.sh" "$root"; git -C "$work/mesa" diff --cached | sha256sum; cc --version; rustc --version; meson --version; } > "$work/environment.txt"
 meson introspect "$work/build" --buildoptions > "$work/buildoptions.json"
 sha256sum "$work/build/src/nouveau/vulkan/libvulkan_nouveau.so" > "$work/library.sha256"
 echo 'CPU/compiler checks completed. Hardware validation NOT RUN.'
