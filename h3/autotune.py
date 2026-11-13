@@ -18,26 +18,29 @@ def key(record):
         raise ValueError("H3 v0 only supports GM107")
     return hashlib.sha256(json.dumps(values, separators=(",", ":")).encode()).hexdigest()
 
-def decide(record, min_gain=0.03):
-    ident = key(record)
-    pairs = record.get("pairs")
+def decide_pairs(pairs, min_gain=0.03):
+    if isinstance(min_gain, bool) or not isinstance(min_gain, (int,float)) or not math.isfinite(min_gain) or not 0 < min_gain < 1:
+        raise ValueError("invalid minimum gain")
     if not isinstance(pairs, list) or len(pairs) < 8:
-        return ident, "base", "insufficient_pairs"
+        return "base", "insufficient_pairs"
     logratios = []
     for p in pairs:
         if not isinstance(p, dict):
-            return ident, "base", "invalid_pair"
+            return "base", "invalid_pair"
         a, b = p.get("base_ns"), p.get("h2_ns")
-        if any(isinstance(x, bool) or not isinstance(x, (float, int)) or not math.isfinite(x) or x <= 0 for x in (a, b)):
-            return ident, "base", "invalid_pair"
-        logratios.append(math.log(b / a))
-    # Conservative one-sided t-style bound; deliberately no normality claim.
+        if any(isinstance(x, bool) or not isinstance(x, (float,int)) or not math.isfinite(x) or x <= 0 for x in (a,b)):
+            return "base", "invalid_pair"
+        logratios.append(math.log(b) - math.log(a))
     mean = statistics.mean(logratios)
     sem = statistics.stdev(logratios) / math.sqrt(len(logratios))
-    upper = mean + 2.5 * sem
-    if upper < math.log(1 - min_gain):
-        return ident, "h2", "measured_gain"
-    return ident, "base", "no_confident_gain"
+    if mean + 2.5 * sem < math.log(1 - min_gain):
+        return "h2", "measured_gain"
+    return "base", "no_confident_gain"
+
+def decide(record, min_gain=0.03):
+    ident = key(record)
+    mode, reason = decide_pairs(record.get("pairs"), min_gain)
+    return ident, mode, reason
 
 def build(records):
     result = {}
