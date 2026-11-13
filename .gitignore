@@ -22,3 +22,5 @@ logs/test-base.log
 logs/test-patched.log
 logs/options-base.json
 logs/options-patched.json
+__pycache__/
+*.pyc

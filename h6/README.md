@@ -75,3 +75,18 @@ Do not write kernel parameters, firmware, voltages, fan curves, power limits or 
 - H6.3: Separate read-only GM107 telemetry collector and evidence-grade GPU-bottleneck detector, with explicit sensor-quality states.
 - H6.4: Explicitly opted-in *stock P-state* actuator only after supervised hardware acceptance and recovery validation.
 - H6.5: Research *possible* beyond-stock clock control as a separate proposal; do not implement an overclock actuator without proving hardware capability and validating board-specific safeguards.
+
+## H6.2 implemented: abstract percent simulation
+
+`percent.py` is independent of the old stock-state simulator. It never reads or writes devices and offers no apply switch. Default abstract levels 100/103/106% are **synthetic test parameters**, not supported or safe GM107 frequencies. A cap floors to an explicitly listed level; no interpolation or invented hardware state occurs. MHz remains null unless an explicit reference is supplied (the example reference in tests is synthetic).
+
+It requires trusted busy **and** CPU/GPU/frame timing plus explicit healthy sensor/fan and no power/clock-fault signals. GPU-bound classification requires >=85% busy, GPU duration >=80% of frame time, CPU duration <=80% of GPU duration and a missed target. It ramps one abstract step after sustained demand, with separate down threshold/dwell and cooldown. CPU-bound demand, missing/untrusted/faulty telemetry, temperature rejection, malformed or nonmonotonic timestamps, or stale trace gaps return to 100%. Invalid samples preserve the recovery cooldown. Hysteresis prevents oscillating between steps.
+
+Those thresholds are a conservative artificial policy for tests, not validated measurements or guarantees. Real timing must distinguish GPU work from presentation/CPU waits; supplying low FPS or KDE's 0% alone never qualifies. Thermal thresholds alone cannot establish safety. Requested percent is relative to a recorded stock core reference; it is not utilization or predicted FPS.
+
+```sh
+python3 -m unittest discover -s h6 -p 'test_*.py' -v
+python3 h6/percent.py h6/percent-example.jsonl
+```
+
+Every output includes `applied_to_hardware=false` and `hardware_support_verified=false`. `percent-example.jsonl` is explicitly synthetic. Hardware collection/actuation and real speedups remain NOT RUN. H2/H3 compiler experiments must retain fixed, recorded clock policy; do not combine them with future H6 state changes.

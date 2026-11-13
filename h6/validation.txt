@@ -1,0 +1,32 @@
+test_driver_guard (test_governor.GovernorTests.test_driver_guard) ... ok
+test_gpu_guard (test_governor.GovernorTests.test_gpu_guard) ... ok
+test_hysteresis_hold (test_governor.GovernorTests.test_hysteresis_hold) ... ok
+test_idle_down_dwell_and_cooldown (test_governor.GovernorTests.test_idle_down_dwell_and_cooldown) ... ok
+test_invalid_busy_fails_closed (test_governor.GovernorTests.test_invalid_busy_fails_closed) ... ok
+test_missing_temperature_fails_closed (test_governor.GovernorTests.test_missing_temperature_fails_closed) ... ok
+test_never_write_to_hardware (test_governor.GovernorTests.test_never_write_to_hardware) ... ok
+test_no_boost_when_temp_above_boost_gate (test_governor.GovernorTests.test_no_boost_when_temp_above_boost_gate) ... ok
+test_sustained_load_boosts_only_after_dwell (test_governor.GovernorTests.test_sustained_load_boosts_only_after_dwell) ... ok
+test_thermal_down_immediate (test_governor.GovernorTests.test_thermal_down_immediate) ... ok
+test_unordered_samples_rejected (test_governor.GovernorTests.test_unordered_samples_rejected) ... ok
+test_untrusted_busy_never_boosts (test_governor.GovernorTests.test_untrusted_busy_never_boosts) ... ok
+test_bad_config (test_percent.PercentTests.test_bad_config) ... ok
+test_cap_floor (test_percent.PercentTests.test_cap_floor) ... ok
+test_cpu_bound_is_baseline (test_percent.PercentTests.test_cpu_bound_is_baseline) ... ok
+test_deterministic (test_percent.PercentTests.test_deterministic) ... ok
+test_down_dwell (test_percent.PercentTests.test_down_dwell) ... ok
+test_fallback_signals (test_percent.PercentTests.test_fallback_signals) ... ok
+test_hysteresis_hold (test_percent.PercentTests.test_hysteresis_hold) ... ok
+test_invalid_sample_preserves_recovery_cooldown (test_percent.PercentTests.test_invalid_sample_preserves_recovery_cooldown) ... ok
+test_invalid_timestamp_resets (test_percent.PercentTests.test_invalid_timestamp_resets) ... ok
+test_malformed (test_percent.PercentTests.test_malformed) ... ok
+test_missing_fields_fall_back (test_percent.PercentTests.test_missing_fields_fall_back) ... ok
+test_no_invented_reference (test_percent.PercentTests.test_no_invented_reference) ... ok
+test_ramp_dwell_and_cooldown (test_percent.PercentTests.test_ramp_dwell_and_cooldown) ... ok
+test_stale_gap_breaks_dwell (test_percent.PercentTests.test_stale_gap_breaks_dwell) ... ok
+test_temperature_blocks_up (test_percent.PercentTests.test_temperature_blocks_up) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.005s
+
+OK

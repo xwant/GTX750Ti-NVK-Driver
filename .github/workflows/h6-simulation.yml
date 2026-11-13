@@ -1,0 +1,19 @@
+name: H6 simulation only
+on:
+  push:
+    branches: ['experiment/h6-percent-simulation']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  simulation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 -m unittest discover -s h6 -p 'test_*.py' -v
+          python3 -O -m unittest discover -s h6 -p 'test_*.py' -v
+          python3 h6/percent.py h6/percent-example.jsonl > /tmp/percent-a.jsonl
+          python3 h6/percent.py h6/percent-example.jsonl > /tmp/percent-b.jsonl
+          cmp /tmp/percent-a.jsonl /tmp/percent-b.jsonl
+          echo 'Simulation only; hardware NOT RUN.' >> "$GITHUB_STEP_SUMMARY"
