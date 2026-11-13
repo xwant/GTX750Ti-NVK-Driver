@@ -73,3 +73,15 @@ class AuditTests(unittest.TestCase):
             r=Path(tmp);lib=r/'libvulkan_nouveau.so';lib.write_bytes(b'fixture')
             p=subprocess.run([sys.executable,str(Path(__file__).parent/'launch_verified.py'),'--out',str(r),'--expected',str(lib),'--checksum','0'*64,'--',sys.executable,'-c','raise SystemExit(0)'],capture_output=True)
             self.assertNotEqual(p.returncode,0);self.assertFalse((r/'stdout.txt').exists())
+    def test_interrupted_measurement_keeps_only_partial_summary(self):
+        import os
+        from unittest.mock import patch
+        import measure_micro
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'results').mkdir()
+            with patch.dict(os.environ,{'GM107_H2_WORKDIR':tmp}),patch.object(sys,'argv',['measure_micro.py','--control','off-on','--pairs','8']),patch.object(measure_micro,'read_run',return_value=[1.0]*30),patch.object(measure_micro.subprocess,'run',side_effect=[None,None,subprocess.CalledProcessError(1,['fixture'])]):
+                with self.assertRaises(subprocess.CalledProcessError):measure_micro.main()
+            outputs=list((root/'results').glob('*.json'))
+            self.assertEqual(len(outputs),1);self.assertTrue(outputs[0].name.endswith('.partial.json'))
+            result=json.loads(outputs[0].read_text());self.assertEqual(len(result['pairs']),1)
+            self.assertNotIn('bootstrap95',result)

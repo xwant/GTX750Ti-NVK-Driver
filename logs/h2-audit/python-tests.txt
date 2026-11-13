@@ -2,6 +2,7 @@ test_c0_bad_types_negative_and_partial (test_audit.AuditTests.test_c0_bad_types_
 test_child_mapping_collector_and_exit_status (test_audit.AuditTests.test_child_mapping_collector_and_exit_status) ... ok
 test_csv_rejections_survive_optimized_python (test_audit.AuditTests.test_csv_rejections_survive_optimized_python) ... ok
 test_icd_relocation_and_mismatch (test_audit.AuditTests.test_icd_relocation_and_mismatch) ... ok
+test_interrupted_measurement_keeps_only_partial_summary (test_audit.AuditTests.test_interrupted_measurement_keeps_only_partial_summary) ... ok
 test_mapping_verification (test_audit.AuditTests.test_mapping_verification) ... ok
 test_read_run_requires_complete_evidence (test_audit.AuditTests.test_read_run_requires_complete_evidence) ... ok
 test_short_no_mapping_is_unverified (test_audit.AuditTests.test_short_no_mapping_is_unverified) ... ok
@@ -14,6 +15,6 @@ test_reasons (test_c0.Tests.test_reasons) ... ok
 test_selected (test_c0.Tests.test_selected) ... ok
 
 ----------------------------------------------------------------------
-Ran 14 tests in 0.668s
+Ran 15 tests in 0.729s
 
 OK
