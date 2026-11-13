@@ -1,0 +1,706 @@
+From d12b0a5aed72b0832e9884c7ada5057ca77378fa Mon Sep 17 00:00:00 2001
+From: GM107 Research <gm107@example.invalid>
+Date: Fri, 13 Nov 2026 21:21:42 +0100
+Subject: [PATCH] nvk: capture canonical shader identities and NIR NAK
+ telemetry without selecting policy
+
+---
+ src/nouveau/vulkan/meson.build                |   7 +
+ src/nouveau/vulkan/nvk_shader.c               |  12 +
+ src/nouveau/vulkan/nvk_shader_telemetry.c     | 188 ++++++++++++++++
+ src/nouveau/vulkan/nvk_shader_telemetry.h     |  24 ++
+ .../vulkan/test_nvk_shader_telemetry.c        | 210 ++++++++++++++++++
+ src/vulkan/runtime/vk_pipeline.c              |  84 +++++++
+ src/vulkan/runtime/vk_pipeline.h              |   4 +
+ src/vulkan/runtime/vk_shader.c                |  17 ++
+ src/vulkan/runtime/vk_shader.h                |   4 +
+ 9 files changed, 550 insertions(+)
+ create mode 100644 src/nouveau/vulkan/nvk_shader_telemetry.c
+ create mode 100644 src/nouveau/vulkan/nvk_shader_telemetry.h
+ create mode 100644 src/nouveau/vulkan/test_nvk_shader_telemetry.c
+
+diff --git a/src/nouveau/vulkan/meson.build b/src/nouveau/vulkan/meson.build
+index f0bb780f..d2fb0db9 100644
+--- a/src/nouveau/vulkan/meson.build
++++ b/src/nouveau/vulkan/meson.build
+@@ -1,6 +1,7 @@
+ # Copyright © 2022 Collabora Ltd. and Red Hat Inc.
+ # SPDX-License-Identifier: MIT
+ nvk_files = files(
++  'nvk_shader_telemetry.c',
+   'nvk_acceleration_structure.c',
+   'nvk_buffer.c',
+   'nvk_buffer.h',
+@@ -239,3 +240,9 @@ if with_tests and not with_platform_android
+     suite : ['nouveau'],
+   )
+ endif
++
++if with_tests and not with_platform_android
++  test('nvk_shader_telemetry', executable('test_nvk_shader_telemetry',
++       files('test_nvk_shader_telemetry.c'),
++       dependencies : [nvk_deps], link_with : [libnvk]), suite : ['nouveau'])
++endif
+diff --git a/src/nouveau/vulkan/nvk_shader.c b/src/nouveau/vulkan/nvk_shader.c
+index 6f649f85..15a1eac7 100644
+--- a/src/nouveau/vulkan/nvk_shader.c
++++ b/src/nouveau/vulkan/nvk_shader.c
+@@ -3,6 +3,7 @@
+  * SPDX-License-Identifier: MIT
+  */
+ #include "nvk_shader.h"
++#include "nvk_shader_telemetry.h"
+ 
+ #include "nvk_cmd_buffer.h"
+ #include "nvk_descriptor_set_layout.h"
+@@ -1123,6 +1124,12 @@ nvk_compile_shader(struct nvk_device *dev,
+       return vk_error(dev, VK_ERROR_OUT_OF_HOST_MEMORY);
+    }
+ 
++   /* No NIR traversal, serialization or I/O when diagnostics are disabled. */
++   const bool telemetry = debug_get_bool_option("NVK_SHADER_TELEMETRY", false);
++   struct nvk_shader_telemetry capture = {0};
++   if (telemetry)
++      nvk_shader_telemetry_begin(dev, info, &capture);
++
+    nvk_lower_nir(dev, nir, info->flags, info->robustness,
+                  info->set_layout_count, info->set_layouts,
+                  &shader->cbuf_map);
+@@ -1133,8 +1140,13 @@ nvk_compile_shader(struct nvk_device *dev,
+       fs_key = &fs_key_tmp;
+    }
+ 
++   if (telemetry)
++      nvk_shader_telemetry_late(nir, fs_key, &capture);
++
+    result = nvk_compile_nir(dev, nir, info->flags, info->robustness,
+                             fs_key, shader);
++   if (telemetry && result == VK_SUCCESS)
++      nvk_shader_telemetry_emit(&capture, shader->nak);
+    ralloc_free(nir);
+    if (result != VK_SUCCESS) {
+       nvk_shader_destroy(&dev->vk, &shader->vk, pAllocator);
+diff --git a/src/nouveau/vulkan/nvk_shader_telemetry.c b/src/nouveau/vulkan/nvk_shader_telemetry.c
+new file mode 100644
+index 00000000..1bf7ae05
+--- /dev/null
++++ b/src/nouveau/vulkan/nvk_shader_telemetry.c
+@@ -0,0 +1,188 @@
++/* SPDX-License-Identifier: MIT */
++#include "nvk_shader_telemetry.h"
++#include "nvk_descriptor_set_layout.h"
++#include "nvk_device.h"
++#include "nvk_instance.h"
++#include "nvk_physical_device.h"
++#include "nvk_shader.h"
++#include "nir_serialize.h"
++#include "nir_deref.h"
++#include "nak.h"
++#include "util/blob.h"
++#include "vk_pipeline.h"
++#include "vk_sampler.h"
++#include <inttypes.h>
++#include <stdio.h>
++
++/* A versioned native-Mesa serialization ABI, not a cross-version NIR format.
++ * Scalar context fields are encoded explicitly; pointers/padding are excluded.
++ */
++static void word(struct mesa_blake3 *h, uint64_t v)
++{
++   uint8_t le[8];
++   for (unsigned i = 0; i < 8; i++) le[i] = v >> (8 * i);
++   _mesa_blake3_update(h, le, sizeof(le));
++}
++static bool nir_hash(const nir_shader *nir, blake3_hash hash)
++{
++   struct blob b;
++   blob_init(&b);
++   nir_serialize(&b, nir, true);
++   const bool ok = !b.out_of_memory;
++   if (ok) _mesa_blake3_compute(b.data, b.size, hash);
++   blob_finish(&b);
++   return ok;
++}
++void nvk_shader_telemetry_begin(struct nvk_device *dev,
++                               const struct vk_shader_compile_info *info,
++                               struct nvk_shader_telemetry *o)
++{
++   const struct nvk_physical_device *p = nvk_device_physical(dev);
++   *o = (struct nvk_shader_telemetry){0};
++   o->stage = info->stage;
++   o->chipset = p->info.chipset;
++   o->compiler_flags = nvk_physical_device_compiler_flags(p);
++   const struct nvk_instance *instance = nvk_physical_device_instance(p);
++   memcpy(o->driver, instance->driver_build_sha, BLAKE3_OUT_LEN);
++   o->complete = nir_hash(info->nir, o->nir);
++   o->complete &= info->source_blake3_valid;
++   memcpy(o->source, info->source_blake3, BLAKE3_OUT_LEN);
++   struct mesa_blake3 h;
++   _mesa_blake3_init(&h);
++   word(&h, info->set_layout_count);
++   for (unsigned i = 0; i < info->set_layout_count; i++) {
++      const struct vk_descriptor_set_layout *l = info->set_layouts[i];
++      word(&h, i);
++      word(&h, l != NULL);
++      if (l) {
++         word(&h, l->flags);
++         word(&h, l->dynamic_descriptor_count);
++         _mesa_blake3_update(&h, l->blake3, BLAKE3_OUT_LEN);
++      }
++   }
++   word(&h, info->push_constant_range_count);
++   for (unsigned i = 0; i < info->push_constant_range_count; i++) {
++      const VkPushConstantRange *r = &info->push_constant_ranges[i];
++      word(&h, r->stageFlags); word(&h, r->offset); word(&h, r->size);
++   }
++   /* vk_sampler_state is explicitly hashable, pointer-free and zero-padded. */
++   word(&h, info->embedded_sampler_count);
++   _mesa_blake3_update(&h, info->embedded_samplers,
++                       info->embedded_sampler_count * sizeof(struct vk_sampler_state));
++   _mesa_blake3_final(&h, o->layout);
++
++   _mesa_blake3_init(&h);
++   const char domain[] = "nvk.shader.identity.v1:mesa-8e87a503";
++   _mesa_blake3_update(&h, domain, sizeof(domain));
++   _mesa_blake3_update(&h, o->source, BLAKE3_OUT_LEN);
++   _mesa_blake3_update(&h, o->nir, BLAKE3_OUT_LEN);
++   _mesa_blake3_update(&h, o->layout, BLAKE3_OUT_LEN);
++   word(&h, info->stage); word(&h, p->info.chipset); word(&h, p->info.sm);
++   word(&h, info->flags); word(&h, info->rt_flags); word(&h, info->next_stage_mask);
++   /* Compare H2 off/on with the same input key; compile identity keeps policy.
++    * H2's diagnostic bit does not affect emitted instructions either.
++    */
++   word(&h, o->compiler_flags & ~((UINT64_C(1) << 15) | (UINT64_C(1) << 16)));
++   const struct vk_pipeline_robustness_state *rs = info->robustness;
++   word(&h, rs->uniform_buffers); word(&h, rs->storage_buffers);
++   word(&h, rs->vertex_inputs); word(&h, rs->images);
++   word(&h, rs->null_uniform_buffer_descriptor);
++   word(&h, rs->null_storage_buffer_descriptor);
++   _mesa_blake3_final(&h, o->key);
++
++   nir_foreach_function_impl(impl, info->nir) {
++      nir_foreach_block(block, impl) {
++         nir_foreach_instr(instr, block) {
++            if (instr->type != nir_instr_type_intrinsic) continue;
++            const nir_intrinsic_instr *in = nir_instr_as_intrinsic(instr);
++            uint64_t offset = 0;
++            bool constant = true;
++            if (in->intrinsic == nir_intrinsic_load_ubo) {
++               constant = nir_src_is_const(in->src[1]);
++               if (constant) offset = nir_src_as_uint(in->src[1]);
++            } else if (in->intrinsic == nir_intrinsic_load_deref) {
++               nir_deref_instr *deref = nir_src_as_deref(in->src[0]);
++               if (!nir_deref_mode_is(deref, nir_var_mem_ubo)) continue;
++               for (nir_deref_instr *d = deref; d; d = nir_deref_instr_parent(d)) {
++                  uint64_t add = 0;
++                  if (d->deref_type == nir_deref_type_array && nir_src_is_const(d->arr.index)) {
++                     uint64_t index = nir_src_as_uint(d->arr.index);
++                     uint64_t stride = nir_deref_instr_array_stride(d);
++                     if (!stride || index > UINT64_MAX / stride) { constant = false; break; }
++                     add = index * stride;
++                  } else if (d->deref_type == nir_deref_type_struct) {
++                     int field = glsl_get_struct_field_offset(nir_deref_instr_parent(d)->type,
++                                                              d->strct.index);
++                     if (field < 0) { constant = false; break; }
++                     add = field;
++                  } else if (d->deref_type == nir_deref_type_cast || d->deref_type == nir_deref_type_var) {
++                     break;
++                  } else { constant = false; break; }
++                  if (add > UINT64_MAX - offset) { constant = false; break; }
++                  offset += add;
++               }
++            } else continue;
++            o->ubo_loads++;
++            if (constant) {
++               o->constant_offsets++;
++               uint64_t size = in->num_components * (in->def.bit_size / 8);
++               uint64_t end = offset > UINT64_MAX - size ? UINT64_MAX : offset + size;
++               o->max_ubo_end = MAX2(o->max_ubo_end, MIN2(end, UINT32_MAX));
++            } else o->dynamic_offsets++;
++         }
++      }
++   }
++}
++void nvk_shader_telemetry_late(const nir_shader *nir, const struct nak_fs_key *fs,
++                              struct nvk_shader_telemetry *o)
++{
++   o->complete &= nir_hash(nir, o->late);
++   struct mesa_blake3 h;
++   _mesa_blake3_init(&h);
++   /* Finish the input key with all NAK fragment-key fields before policy use. */
++   _mesa_blake3_update(&h, o->key, BLAKE3_OUT_LEN);
++   word(&h, fs != NULL);
++   if (fs) {
++      word(&h, fs->zs_self_dep); word(&h, fs->force_sample_shading);
++      word(&h, fs->uses_underestimate);
++   }
++   _mesa_blake3_final(&h, o->key);
++   _mesa_blake3_init(&h);
++   _mesa_blake3_update(&h, o->key, BLAKE3_OUT_LEN);
++   _mesa_blake3_update(&h, o->late, BLAKE3_OUT_LEN);
++   _mesa_blake3_update(&h, o->driver, BLAKE3_OUT_LEN);
++   word(&h, o->compiler_flags);
++   _mesa_blake3_final(&h, o->compile);
++}
++void nvk_shader_telemetry_emit(const struct nvk_shader_telemetry *o,
++                              const struct nak_shader_bin *b)
++{
++   char key[65], nir[65], layout[65], source[65], late[65], compile[65], code[65], driver[65];
++   blake3_hash code_hash;
++   _mesa_blake3_compute(b->code, b->code_size, code_hash);
++   _mesa_blake3_format(key, o->key); _mesa_blake3_format(nir, o->nir);
++   _mesa_blake3_format(layout, o->layout); _mesa_blake3_format(source, o->source);
++   _mesa_blake3_format(late, o->late); _mesa_blake3_format(compile, o->compile);
++   _mesa_blake3_format(code, code_hash);
++   _mesa_blake3_format(driver, o->driver);
++   /* One stdio operation holds stderr's lock across the complete record. */
++   fprintf(stderr, "NVK_H3 {\"schema\":\"nvk.shader.telemetry.v1\","
++      "\"identity_complete\":%s,\"hash_algorithm\":\"blake3-256\","
++      "\"shader_key\":\"%s\",\"compile_key\":\"%s\","
++      "\"nir_blake3\":\"%s\",\"layout_blake3\":\"%s\","
++      "\"source_blake3\":\"%s\",\"late_nir_blake3\":\"%s\","
++      "\"code_blake3\":\"%s\",\"stage\":%u,\"chipset\":%u,"
++      "\"driver_build_id\":\"%s\",\"compiler_flags\":\"%016" PRIx64 "\","
++      "\"ubo_loads\":%u,\"ubo_constant_offsets\":%u,\"ubo_nonconstant_offsets\":%u,"
++      "\"ubo_max_constant_end\":%u,\"instructions\":%u,\"gprs\":%u,"
++      "\"spills_to_mem\":%u,\"fills_from_mem\":%u,"
++      "\"spills_to_reg\":%u,\"fills_from_reg\":%u,\"scratch_bytes\":%u,"
++      "\"code_bytes\":%u,\"address_ops\":null,\"gpu_time_ns\":null}\n",
++      o->complete ? "true" : "false", key, compile, nir, layout, source, late, code,
++      o->stage, o->chipset, driver, o->compiler_flags,
++      o->ubo_loads, o->constant_offsets, o->dynamic_offsets, o->max_ubo_end,
++      b->info.num_instrs, b->info.num_gprs,
++      b->info.num_spills_to_mem, b->info.num_fills_from_mem,
++      b->info.num_spills_to_reg, b->info.num_fills_from_reg,
++      b->info.slm_size, b->code_size);
++}
+diff --git a/src/nouveau/vulkan/nvk_shader_telemetry.h b/src/nouveau/vulkan/nvk_shader_telemetry.h
+new file mode 100644
+index 00000000..d692a8ee
+--- /dev/null
++++ b/src/nouveau/vulkan/nvk_shader_telemetry.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: MIT */
++#ifndef NVK_SHADER_TELEMETRY_H
++#define NVK_SHADER_TELEMETRY_H
++#include "util/mesa-blake3.h"
++#include "nir.h"
++struct nvk_device;
++struct vk_shader_compile_info;
++struct nak_shader_bin;
++struct nak_fs_key;
++struct nvk_shader_telemetry {
++   blake3_hash key, nir, layout, source, late, compile, driver;
++   uint64_t compiler_flags;
++   uint32_t ubo_loads, constant_offsets, dynamic_offsets, max_ubo_end;
++   uint32_t stage, chipset;
++   bool complete;
++};
++void nvk_shader_telemetry_begin(struct nvk_device *dev,
++                               const struct vk_shader_compile_info *info,
++                               struct nvk_shader_telemetry *out);
++void nvk_shader_telemetry_late(const nir_shader *nir, const struct nak_fs_key *fs,
++                              struct nvk_shader_telemetry *out);
++void nvk_shader_telemetry_emit(const struct nvk_shader_telemetry *out,
++                              const struct nak_shader_bin *bin);
++#endif
+diff --git a/src/nouveau/vulkan/test_nvk_shader_telemetry.c b/src/nouveau/vulkan/test_nvk_shader_telemetry.c
+new file mode 100644
+index 00000000..3fa55598
+--- /dev/null
++++ b/src/nouveau/vulkan/test_nvk_shader_telemetry.c
+@@ -0,0 +1,210 @@
++/* SPDX-License-Identifier: MIT */
++#include "clb097.h"
++#include "nir_builder.h"
++#include "nir_serialize.h"
++#include "nvk_descriptor_set_layout.h"
++#include "nvk_device.h"
++#include "nvk_instance.h"
++#include "nvk_physical_device.h"
++#include "nvk_shader.h"
++#include "nvk_shader_telemetry.h"
++#include "util/blob.h"
++#include "vk_alloc.h"
++#include "vk_pipeline.h"
++#include <stdio.h>
++#define CHECK(x)                                                                                   \
++   do {                                                                                            \
++      if (!(x)) {                                                                                  \
++         fprintf(stderr, "FAIL %d: %s\n", __LINE__, #x);                                           \
++         abort();                                                                                  \
++      }                                                                                            \
++   } while (0)
++struct fixture {
++   struct nvk_instance instance;
++   struct nvk_physical_device pdev;
++   struct nvk_device dev;
++   struct nvk_descriptor_set_layout *layout;
++   struct vk_pipeline_robustness_state rs;
++};
++struct options {
++   unsigned loads, ordinary, dynamic, offset, index;
++   bool dynamic_offset, dynamic_index, mixed, mutable, push;
++   mesa_shader_stage stage;
++};
++static nir_shader *make_shader(struct fixture *f, struct options o) {
++   unsigned bindings = o.ordinary + o.dynamic;
++   free(f->layout);
++   f->layout = calloc(1, sizeof(*f->layout) + bindings * sizeof(f->layout->binding[0]));
++   CHECK(f->layout);
++   f->layout->binding_count = bindings;
++   f->layout->vk.dynamic_descriptor_count = o.dynamic;
++   if (o.push)
++      f->layout->flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR;
++   nir_builder b = nir_builder_init_simple_shader(o.stage, nak_nir_options(f->pdev.nak), "h2-test");
++   nir_address_format fmt = nvk_ubo_addr_format(&f->pdev, &f->rs);
++   const struct glsl_type *array = glsl_array_type(glsl_uint_type(), 8192, 16);
++   nir_def *sum = nir_imm_int(&b, 0);
++   for (unsigned n = 0; n < bindings; n++) {
++      bool dyn = n >= o.ordinary;
++      f->layout->binding[n] = (struct nvk_descriptor_set_binding_layout){
++          .type = dyn         ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC
++                  : o.mutable ? VK_DESCRIPTOR_TYPE_MUTABLE_EXT
++                              : VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
++          .array_size = 2,
++          .stride = 16,
++          .offset = n * 32,
++          .dynamic_buffer_index = dyn ? n - o.ordinary : 0};
++      nir_def *idx = o.dynamic_index ? nir_load_subgroup_invocation(&b) : nir_imm_int(&b, o.index);
++      nir_def *resource = nir_vulkan_resource_index(
++          &b, nir_address_format_num_components(fmt), nir_address_format_bit_size(fmt), idx,
++          .desc_set = 0, .binding = n, .desc_type = nir_descriptor_type_uniform_buffer,
++          .resource_type = nir_resource_type_uniform_buffer);
++      nir_def *addr = nir_load_vulkan_descriptor(&b, nir_address_format_num_components(fmt),
++                                                 nir_address_format_bit_size(fmt), resource,
++                                                 .desc_type = nir_descriptor_type_uniform_buffer);
++      nir_deref_instr *base =
++          nir_build_deref_cast_with_alignment(&b, addr, nir_var_mem_ubo, array, 0, 16, 0);
++      for (unsigned i = 0; i < o.loads; i++) {
++         nir_def *element = (o.dynamic_offset || (o.mixed && i == 0))
++                                ? nir_load_subgroup_invocation(&b)
++                                : nir_imm_int(&b, o.offset / 16 + i);
++         sum = nir_iadd(&b, sum, nir_load_deref(&b, nir_build_deref_array(&b, base, element)));
++      }
++   }
++   if (o.stage == MESA_SHADER_COMPUTE) {
++      b.shader->info.shared_size = 4;
++      nir_store_shared(&b, sum, nir_imm_int(&b, 0), .align_mul = 4);
++   } else
++      nir_store_output(&b, sum, nir_imm_int(&b, 0), .write_mask = 1, .src_type = nir_type_uint32,
++                       .io_semantics = {.location = o.stage == MESA_SHADER_FRAGMENT
++                                                        ? FRAG_RESULT_DATA0
++                                                        : VARYING_SLOT_VAR0,
++                                        .num_slots = 1});
++   nir_validate_shader(b.shader, "fixture");
++   return b.shader;
++}
++
++static struct vk_shader_compile_info make_info(struct fixture *f, nir_shader *nir,
++                                               struct vk_descriptor_set_layout **layouts) {
++   struct vk_shader_compile_info info = {
++      .stage = nir->info.stage, .nir = nir, .robustness = &f->rs,
++      .flags = VK_SHADER_CREATE_NO_TASK_SHADER_BIT_EXT,
++      .set_layout_count = 1, .set_layouts = layouts,
++      .source_blake3_valid = true,
++   };
++   memset(info.source_blake3, 0x5a, sizeof(info.source_blake3));
++   return info;
++}
++static void identity_tests(struct fixture *f, struct options normal) {
++   nir_shader *nir = make_shader(f, normal);
++   struct vk_descriptor_set_layout *layouts[] = {&f->layout->vk};
++   struct vk_shader_compile_info info = make_info(f, nir, layouts);
++   struct nvk_shader_telemetry a, b;
++   nvk_shader_telemetry_begin(&f->dev, &info, &a);
++   CHECK(a.complete && a.ubo_loads == 8 && a.constant_offsets == 8 && a.max_ubo_end == 116);
++   nvk_shader_telemetry_begin(&f->dev, &info, &b);
++   CHECK(!memcmp(a.key,b.key,32));
++   nir->info.name = ralloc_strdup(nir, "debug-only-name");
++   nvk_shader_telemetry_begin(&f->dev, &info, &b);
++   CHECK(!memcmp(a.key,b.key,32));
++   nir_shader *copy = nir_shader_clone(NULL, nir);
++   info.nir = copy;
++   nvk_shader_telemetry_begin(&f->dev, &info, &b);
++   CHECK(!memcmp(a.key,b.key,32));
++   ralloc_free(copy); info.nir = nir;
++#define CHANGE(expr, undo) do {expr; nvk_shader_telemetry_begin(&f->dev,&info,&b); \
++   CHECK(memcmp(a.key,b.key,32)); undo;} while (0)
++   CHANGE(info.source_blake3[0]++, info.source_blake3[0]--);
++   CHANGE(f->layout->vk.blake3[0]++, f->layout->vk.blake3[0]--);
++   CHANGE(f->layout->vk.flags++, f->layout->vk.flags--);
++   CHANGE(f->rs.null_uniform_buffer_descriptor = true,
++          f->rs.null_uniform_buffer_descriptor = false);
++   CHANGE(info.next_stage_mask = VK_SHADER_STAGE_COMPUTE_BIT, info.next_stage_mask = 0);
++   VkPushConstantRange range = {.stageFlags=VK_SHADER_STAGE_FRAGMENT_BIT,.size=4};
++   info.push_constant_ranges = &range;
++   CHANGE(info.push_constant_range_count = 1, info.push_constant_range_count = 0);
++   struct nak_fs_key fs = {0};
++   b = a;
++   nvk_shader_telemetry_late(nir,&fs,&a);
++   fs.force_sample_shading = true;
++   nvk_shader_telemetry_late(nir,&fs,&b);
++   CHECK(memcmp(a.key,b.key,32));
++   info.source_blake3_valid = false;
++   nvk_shader_telemetry_begin(&f->dev,&info,&b);
++   CHECK(!b.complete);
++   ralloc_free(nir);
++   puts("PASS deterministic identity and context separation");
++}
++static void compiler_tests(struct fixture *f, struct options o) {
++   struct nvk_shader *sh[2];
++   uint64_t flags = nvk_physical_device_compiler_flags(&f->pdev);
++   for (unsigned diag=0;diag<2;diag++) {
++      setenv("NVK_SHADER_TELEMETRY", diag ? "true" : "false", 1);
++      nir_shader *nir = make_shader(f,o);
++      nvk_device_shader_ops.preprocess_nir(&f->pdev.vk,nir,&f->rs);
++      struct vk_descriptor_set_layout *layouts[] = {&f->layout->vk};
++      struct vk_shader_compile_info info = make_info(f,nir,layouts);
++      struct vk_shader *out;
++      CHECK(nvk_device_shader_ops.compile(&f->dev.vk,1,&info,NULL,NULL,NULL,&out)==VK_SUCCESS);
++      sh[diag] = container_of(out,struct nvk_shader,vk);
++      CHECK(flags == nvk_physical_device_compiler_flags(&f->pdev));
++   }
++   CHECK(sh[0]->code_size > 0 && sh[0]->code_size == sh[1]->code_size);
++   CHECK(!memcmp(sh[0]->code_ptr,sh[1]->code_ptr,sh[0]->code_size));
++   CHECK(!memcmp(&sh[0]->info,&sh[1]->info,sizeof(sh[0]->info)));
++   CHECK(!memcmp(&sh[0]->cbuf_map,&sh[1]->cbuf_map,sizeof(sh[0]->cbuf_map)));
++   puts("PASS telemetry off/on exact SM50 machine code, metadata, cbuf map and compiler flags");
++   for(unsigned i=0;i<2;i++) sh[i]->vk.ops->destroy(&f->dev.vk,&sh[i]->vk,NULL);
++}
++
++static void source_tests(void) {
++   const uint32_t spirv[] = {0x07230203,0x00010000,0,1,0};
++   const VkShaderModuleCreateInfo module = {
++      .sType=VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
++      .codeSize=sizeof(spirv), .pCode=spirv,
++   };
++   uint32_t data[] = {5,7,999};
++   VkSpecializationMapEntry map[] = {{.constantID=2,.offset=0,.size=4},
++                                    {.constantID=1,.offset=4,.size=4}};
++   VkSpecializationInfo spec = {.mapEntryCount=2,.pMapEntries=map,
++                                .dataSize=sizeof(data),.pData=data};
++   VkPipelineShaderStageCreateInfo info = {
++      .sType=VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,.pNext=&module,
++      .stage=VK_SHADER_STAGE_FRAGMENT_BIT,.pName="main",.pSpecializationInfo=&spec,
++   };
++   blake3_hash a,b;
++   CHECK(vk_pipeline_shader_source_identity(&info,a));
++   VkSpecializationMapEntry swap=map[0];map[0]=map[1];map[1]=swap;
++   data[2]++; /* Unused bytes and map order cannot alter identity. */
++   CHECK(vk_pipeline_shader_source_identity(&info,b)); CHECK(!memcmp(a,b,32));
++   data[0]++;
++   CHECK(vk_pipeline_shader_source_identity(&info,b)); CHECK(memcmp(a,b,32));
++   data[0]--; info.pName="other";
++   CHECK(vk_pipeline_shader_source_identity(&info,b)); CHECK(memcmp(a,b,32));
++   info.pName="main"; map[0].offset=UINT32_MAX;
++   CHECK(!vk_pipeline_shader_source_identity(&info,b));
++   map[0]=map[1]; CHECK(!vk_pipeline_shader_source_identity(&info,b));
++   puts("PASS actual source specialization canonicalization, entrypoint and malformed ranges");
++}
++int main(void) {
++   glsl_type_singleton_init_or_ref();
++   struct fixture f = {0};
++   f.pdev.info=(struct nv_device_info){.chipset=0x117,.sm=50,.cls_eng3d=MAXWELL_A,.max_warps_per_mp=64};
++   f.pdev.vk.instance=&f.instance.vk;
++   f.pdev.nak=nak_compiler_create(&f.pdev.info); CHECK(f.pdev.nak);
++   f.dev.vk.physical=&f.pdev.vk; f.dev.vk.alloc=*vk_default_allocator();
++   f.dev.vk.base.type=VK_OBJECT_TYPE_DEVICE;
++   f.rs=(struct vk_pipeline_robustness_state){
++      .uniform_buffers=VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT,
++      .storage_buffers=VK_PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT,
++      .images=VK_PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_ROBUST_IMAGE_ACCESS_2_EXT};
++   const struct options normal={.loads=8,.ordinary=1,.stage=MESA_SHADER_FRAGMENT};
++   source_tests();
++   identity_tests(&f,normal);
++   compiler_tests(&f,normal);
++   struct options dynamic=normal; dynamic.dynamic_offset=true;
++   compiler_tests(&f,dynamic);
++   struct options compute=normal; compute.stage=MESA_SHADER_COMPUTE;
++   compiler_tests(&f,compute);
++   free(f.layout); nak_compiler_destroy(f.pdev.nak); glsl_type_singleton_decref();
++}
+diff --git a/src/vulkan/runtime/vk_pipeline.c b/src/vulkan/runtime/vk_pipeline.c
+index 4c06e7db..b820c9b0 100644
+--- a/src/vulkan/runtime/vk_pipeline.c
++++ b/src/vulkan/runtime/vk_pipeline.c
+@@ -321,6 +321,78 @@ vk_pipeline_hash_shader_stage_blake3(VkPipelineCreateFlags2KHR pipeline_flags,
+    _mesa_blake3_final(&ctx, stage_blake3);
+ }
+ 
++
++/* Diagnostic identity only. Unlike the cache hash above, this canonicalizes
++ * specialization entries and excludes caller padding and unused data bytes.
++ * No compiler/cache semantics are changed.
++ */
++static int spec_entry_compare(const void *a, const void *b)
++{
++   uint32_t x = ((const VkSpecializationMapEntry *)a)->constantID;
++   uint32_t y = ((const VkSpecializationMapEntry *)b)->constantID;
++   return (x > y) - (x < y);
++}
++static void identity_word(struct mesa_blake3 *h, uint64_t v)
++{
++   uint8_t le[8];
++   for (unsigned i = 0; i < 8; i++) le[i] = v >> (8 * i);
++   _mesa_blake3_update(h, le, sizeof(le));
++}
++bool
++vk_pipeline_shader_source_identity(const VkPipelineShaderStageCreateInfo *info,
++                                    blake3_hash out)
++{
++   struct mesa_blake3 h;
++   _mesa_blake3_init(&h);
++   memset(out, 0, BLAKE3_OUT_LEN);
++   const char domain[] = "vk.shader.source.v1";
++   _mesa_blake3_update(&h, domain, sizeof(domain));
++   VK_FROM_HANDLE(vk_shader_module, module, info->module);
++   const VkShaderModuleCreateInfo *minfo =
++      vk_find_struct_const(info->pNext, SHADER_MODULE_CREATE_INFO);
++   if (module) {
++      _mesa_blake3_update(&h, module->hash, sizeof(module->hash));
++   } else if (minfo) {
++      blake3_hash hash;
++      vk_shader_module_hash(minfo, hash);
++      _mesa_blake3_update(&h, hash, sizeof(hash));
++   } else {
++      /* Identifier-only modules and internal builtins have no recoverable
++       * original SPIR-V here. Emit an incomplete diagnostic, never invent it.
++       */
++      return false;
++   }
++   if (!info->pName) return false;
++   identity_word(&h, strlen(info->pName));
++   _mesa_blake3_update(&h, info->pName, strlen(info->pName));
++   identity_word(&h, info->stage);
++   identity_word(&h, info->flags);
++   identity_word(&h, get_required_subgroup_size(info));
++   const VkSpecializationInfo *spec = info->pSpecializationInfo;
++   uint32_t count = spec ? spec->mapEntryCount : 0;
++   identity_word(&h, count);
++   if (count) {
++      if (!spec->pMapEntries || !spec->pData || count > 4096)
++         return false;
++      VkSpecializationMapEntry *entries = malloc(count * sizeof(*entries));
++      if (!entries) return false;
++      memcpy(entries, spec->pMapEntries, count * sizeof(*entries));
++      qsort(entries, count, sizeof(*entries), spec_entry_compare);
++      for (uint32_t i = 0; i < count; i++) {
++         const VkSpecializationMapEntry *e = &entries[i];
++         if ((i && e->constantID == entries[i-1].constantID) ||
++             e->offset > spec->dataSize || e->size > spec->dataSize - e->offset) {
++            free(entries); return false;
++         }
++         identity_word(&h, e->constantID); identity_word(&h, e->size);
++         _mesa_blake3_update(&h, (const char *)spec->pData + e->offset, e->size);
++      }
++      free(entries);
++   }
++   _mesa_blake3_final(&h, out);
++   return true;
++}
++
+ void
+ vk_pipeline_hash_shader_stage(VkPipelineCreateFlags2KHR pipeline_flags,
+                               const VkPipelineShaderStageCreateInfo *info,
+@@ -890,6 +962,10 @@ struct vk_pipeline_stage {
+    /* Whether the shader was imported from a library (Gfx pipelines only) */
+    bool imported:1;
+ 
++   /* Diagnostic-only original source identity; never part of cache lookup. */
++   blake3_hash source_identity;
++   bool source_identity_valid;
++
+    /* Hash used to lookup the precomp */
+    blake3_hash precomp_key;
+ 
+@@ -914,6 +990,9 @@ vk_pipeline_hash_precomp_shader_stage(struct vk_device *device,
+ 
+    vk_pipeline_hash_shader_stage_blake3(pipeline_flags, info,
+                                         &rs, stage->precomp_key);
++   stage->source_identity_valid =
++      debug_get_bool_option("NVK_SHADER_TELEMETRY", false) &&
++      vk_pipeline_shader_source_identity(info, stage->source_identity);
+ }
+ 
+ static VkResult
+@@ -1825,6 +1904,8 @@ vk_graphics_pipeline_compile_shaders(struct vk_device *device,
+             .push_constant_range_count = push_range != NULL,
+             .push_constant_ranges = push_range != NULL ? push_range : NULL,
+          };
++         memcpy(infos[i].source_blake3, stage->source_identity, BLAKE3_OUT_LEN);
++         infos[i].source_blake3_valid = stage->source_identity_valid;
+       }
+ 
+       /* vk_shader_ops::compile() consumes the NIR regardless of whether or
+@@ -2465,6 +2546,9 @@ vk_pipeline_compile_compute_stage(struct vk_device *device,
+       .push_constant_ranges = push_range != NULL ? push_range : NULL,
+    };
+ 
++   memcpy(compile_info.source_blake3, stage->source_identity, BLAKE3_OUT_LEN);
++   compile_info.source_blake3_valid = stage->source_identity_valid;
++
+    struct vk_shader *shader;
+    result = vk_compile_shaders(device, 1, &compile_info,
+                                NULL, &device->enabled_features,
+diff --git a/src/vulkan/runtime/vk_pipeline.h b/src/vulkan/runtime/vk_pipeline.h
+index 3c7cafd7..9135270a 100644
+--- a/src/vulkan/runtime/vk_pipeline.h
++++ b/src/vulkan/runtime/vk_pipeline.h
+@@ -91,6 +91,10 @@ PRAGMA_DIAGNOSTIC_POP
+  * Can only be used if VkPipelineShaderStageCreateInfo::module is a
+  * vk_shader_module object.
+  */
++bool
++vk_pipeline_shader_source_identity(const VkPipelineShaderStageCreateInfo *info,
++                                    uint8_t out[32]);
++
+ void
+ vk_pipeline_hash_shader_stage(VkPipelineCreateFlags2KHR pipeline_flags,
+                               const VkPipelineShaderStageCreateInfo *info,
+diff --git a/src/vulkan/runtime/vk_shader.c b/src/vulkan/runtime/vk_shader.c
+index 6354e51d..44fe4605 100644
+--- a/src/vulkan/runtime/vk_shader.c
++++ b/src/vulkan/runtime/vk_shader.c
+@@ -323,6 +323,23 @@ vk_shader_compile_info_init(struct vk_shader_compile_info *info,
+       .push_constant_range_count = vk_info->pushConstantRangeCount,
+       .push_constant_ranges = vk_info->pPushConstantRanges,
+    };
++   const VkShaderModuleCreateInfo module = {
++      .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
++      .pNext = vk_info->pNext,
++      .codeSize = vk_info->codeSize,
++      .pCode = vk_info->pCode,
++   };
++   const VkPipelineShaderStageCreateInfo stage = {
++      .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
++      .pNext = &module,
++      .stage = vk_info->stage,
++      .pName = vk_info->pName,
++      .pSpecializationInfo = vk_info->pSpecializationInfo,
++   };
++   info->source_blake3_valid =
++      debug_get_bool_option("NVK_SHADER_TELEMETRY", false) &&
++      vk_pipeline_shader_source_identity(&stage, info->source_blake3);
++
+ }
+ 
+ PRAGMA_DIAGNOSTIC_PUSH
+diff --git a/src/vulkan/runtime/vk_shader.h b/src/vulkan/runtime/vk_shader.h
+index 4e0d4dc8..8f43047b 100644
+--- a/src/vulkan/runtime/vk_shader.h
++++ b/src/vulkan/runtime/vk_shader.h
+@@ -96,6 +96,10 @@ struct vk_shader_compile_info {
+    VkShaderStageFlags next_stage_mask;
+    struct nir_shader *nir;
+ 
++   /* Diagnostic source identity, including entrypoint and specialization. */
++   blake3_hash source_blake3;
++   bool source_blake3_valid;
++
+    const struct vk_pipeline_robustness_state *robustness;
+ 
+    uint32_t set_layout_count;
+-- 
+2.52.0
+
