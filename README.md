@@ -66,3 +66,7 @@ python3 -m unittest discover -s bench -p 'test_compare_ab.py' -v
 Каждый воспроизводимый результат фиксируем в [`docs/DEVLOG.md`](docs/DEVLOG.md), отдельные задачи — в существующих GitHub Issues. Для новых результатов указываем kernel version, используемый ICD, способ воспроизведения, относящиеся к тесту ошибки, итоги и откат. Не публикуем приватные токены, домашние пути с персональными данными, произвольные дампы памяти.
 
 Лицензии исходных частей определяются их SPDX/лицензиями; Mesa распространяется по своим лицензиям. Этот репозиторий содержит **патч**, а не копию всего дерева Mesa.
+
+## Hardware-readiness audit (13 November 2026)
+
+See [H2_AUDIT.md](docs/H2_AUDIT.md). This branch corrects measurement/evidence tooling, keeps both Mesa patches unchanged, and does not claim physical-GPU acceptance. Run `python3 -m unittest discover -s bench/h2 -p 'test_*.py' -v`. The collector supplies H3-compatible manifests and requires verified driver mappings before timing results are accepted.

@@ -31,7 +31,7 @@ for variant in base h2; do
  target="src/nouveau/vulkan/nouveau_devenv_icd.$(uname -m).json"
  ninja -C "$build" -j "${GM107_JOBS:-4}" src/nouveau/vulkan/libvulkan_nouveau.so "$target" 2>&1 | tee "$work/logs/build-$variant.log"
  meson test -C "$build" --suite nouveau --print-errorlogs -j "${GM107_JOBS:-4}" 2>&1 | tee "$work/logs/tests-$variant.log"
- cp "$build/$target" "$work/icd/$variant.json"
+ python3 "$root/bench/h2/evidence.py" icd "$build/$target" "$work/icd/$variant.json" "$build/src/nouveau/vulkan/libvulkan_nouveau.so"
  meson introspect "$build" --buildoptions > "$work/logs/options-$variant.json"
  git -C "$src" rev-parse HEAD > "$work/logs/head-$variant.txt"
  git -C "$src" diff > "$work/logs/dirty-$variant.patch"

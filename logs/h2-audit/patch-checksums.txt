@@ -1,0 +1,2 @@
+0001-nvk-diagnose-GM107-fragment-UBO-cbuf-applicability-w.patch: OK
+0002-nvk-opt-in-to-one-conservative-GM107-fragment-UBO-cb.patch: OK

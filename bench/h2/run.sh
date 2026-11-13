@@ -21,21 +21,14 @@ unset NAK_DEBUG NVK_GM107_CMD_CACHE_LIMIT_KIB MESA_SHADER_CACHE_DISABLE
 if [[ "$mode" == diag* ]]; then export MESA_SHADER_CACHE_DISABLE=true; fi
 printf 'mode=%s\nICD=%s\nflags=%s\ncache=%s\n' "$mode" "$VK_DRIVER_FILES" "$NVK_DEBUG" "$MESA_SHADER_CACHE_DIR" > "$out/launch.txt"
 cp "$work/logs/library-$variant.sha256" "$out/"
-"$@" > "$out/stdout.txt" 2> "$out/stderr.txt" & pid=$!
-(
- while kill -0 "$pid" 2>/dev/null; do
-  for p in "$pid" $(pgrep -u "$(id -u)" -x dota2 2>/dev/null || true); do
-   if [[ -r /proc/$p/maps ]]; then awk '/libvulkan_nouveau|libGLX_nvidia|libvulkan_lvp/{print $NF}' "/proc/$p/maps" >> "$out/loaded-libraries.txt" || true; fi
-  done
-  sleep 1
- done
-) & monitor=$!
+expected="$work/mesa-$variant/build-h2/src/nouveau/vulkan/libvulkan_nouveau.so"
+checksum=$(cut -d ' ' -f1 "$work/logs/library-$variant.sha256")
 set +e
-wait "$pid"; status=$?
-wait "$monitor"
+python3 "$root/bench/h2/launch_verified.py" --out "$out" --expected "$expected" --checksum "$checksum" -- "$@"
+status=$?
 set -e
-printf '%s\n' "$status" > "$out/exit-status.txt"
-if [[ -f "$out/loaded-libraries.txt" ]]; then sort -u "$out/loaded-libraries.txt" -o "$out/loaded-libraries.txt"; fi
+# The collector reports unverified coverage explicitly; performance consumers
+# must require verification.json=verified rather than interpreting silence.
 cat "$out/stdout.txt"; tail -20 "$out/stderr.txt" >&2
 if [[ "$mode" == diag* ]]; then python3 "$root/bench/h2/summarize_c0.py" "$out/stderr.txt" > "$out/c0-summary.json"; fi
 echo "Records: $out" >&2
