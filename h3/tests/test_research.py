@@ -35,3 +35,12 @@ class ResearchTests(unittest.TestCase):
     def test_missing_feature_fallback(self):
         f=record()['features'];f['draws']=None
         self.assertEqual(predict(dict(feature='draws',threshold=32,left=dict(mode='h2'),right=dict(mode='base')),f),'base')
+    def test_same_shader_different_layouts_stay_together(self):
+        from h3.dataset import digest
+        rows=[record(i) for i in range(20)]
+        for i,r in enumerate(rows):
+            r['kind']='per_shader'
+            r['identity'].update(shader_sha256=digest('shared' if i<2 else str(i)),
+                                 layout_sha256=digest('layout'+str(i)),compiler_identity=digest('compiler'))
+        train,test=grouped_split(rows)
+        self.assertEqual(rows[0] in train,rows[1] in train)

@@ -199,8 +199,20 @@ def import_h2(summary_path, runs_root, manifest_path):
             require(math.isclose(statistics.mean(values)/1e6,stated,rel_tol=1e-10,abs_tol=1e-9), 'summary/raw mean mismatch')
             # Hardware classification is a manifest claim AND recorded device/readback evidence.
             stderr=(path/'stderr.txt').read_text()
+            configs=[line for line in stderr.splitlines() if line.startswith('CONFIG ')]
+            require(len(configs)==1,'missing/ambiguous benchmark config')
+            actual=dict(token.split('=',1) for token in configs[0].split()[1:])
+            expected=dict(reads=str(raw['reads']),draws=str(raw['draws']),rebind=str(int(raw['rebind'])),dynamic='0',width='1280',height='720',validation='0')
+            require(actual==expected,'summary/scenario mismatch or diagnostic timing')
             if meta['origin']=='hardware':
                 require('software=0' in stderr and 'GTX 750 Ti' in stderr and 'MAPPING ' in stderr and 'libvulkan_nouveau' in stderr, 'missing device/library evidence')
+                verification=load(path/'verification.json')
+                require(verification.get('status')=='verified','unverified loaded library')
+                sha(verification.get('sha256'))
+                variant='base' if mode=='base' else 'h2'
+                checksum=path/f'library-{variant}.sha256'
+                require(checksum.read_text().split()[0]==verification['sha256'],'library hash conflict')
+                artifacts.extend([dict(name=name+'/verification.json',sha256=filehash(path/'verification.json')),dict(name=name+'/'+checksum.name,sha256=filehash(checksum))])
             require('PASS all pixels' in stderr, 'missing completion marker')
             for filename in ('stdout.txt','stderr.txt','launch.txt','exit-status.txt'):
                 artifacts.append(dict(name=name+'/'+filename,sha256=filehash(path/filename)))

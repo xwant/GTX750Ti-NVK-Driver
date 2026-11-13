@@ -36,7 +36,7 @@ def grouped_split(records, seed=750):
     return train,test
 
 def eligible(f):
-    return f['h2_eligible'] is True and f['stage']=='fragment' and f['descriptor_class']=='ordinary' and f['access']=='constant' and f['static_ubo_loads'] is not None and f['static_ubo_loads']>=8 and f['cbuf_bytes'] is not None and f['cbuf_bytes']<=65536
+    return f['h2_eligible'] is True and f['stage']=='fragment' and f['descriptor_class']=='ordinary' and f['access']=='constant' and f['static_ubo_loads'] is not None and f['static_ubo_loads']>=8 and f['cbuf_bytes'] is not None and 0<f['cbuf_bytes']<=65536
 
 def label(r):
     # Calibration half only. Evaluation uses independent later pairs.

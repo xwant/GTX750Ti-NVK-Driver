@@ -76,7 +76,7 @@ def h2_fixture(root):
         for mode in order:
             name=f'case-{i}-{mode}';run=root/name;run.mkdir()
             (run/'exit-status.txt').write_text('0\n');(run/'launch.txt').write_text('mode='+mode+'\n')
-            (run/'stderr.txt').write_text('PASS all pixels, software=0; no FPS claim\n')
+            (run/'stderr.txt').write_text('CONFIG reads=8 draws=1 rebind=0 dynamic=0 width=1280 height=720 validation=0\nPASS all pixels, software=0; no FPS claim\n')
             val=1 if mode=='off' else .9
             with (run/'stdout.txt').open('w') as f:
                 w=csv.writer(f);w.writerow(['sample','gpu_ms','cpu_record_ms','submit_wait_ms','readback_ok','software'])
@@ -95,7 +95,7 @@ class ImportTests(unittest.TestCase):
             self.assertIsNone(r['features']['gprs']);self.assertIsNone(r['features']['static_ubo_loads'])
             self.assertEqual(r['kind'],'microbenchmark')
     def test_reject_incomplete_corrupt_and_origin(self):
-        for case in ('missing','short','nan','mean','origin','order','path','unfinished'):
+        for case in ('missing','short','nan','mean','origin','order','path','unfinished','config'):
             with self.subTest(case=case),tempfile.TemporaryDirectory() as tmp:
                 s,m=h2_fixture(tmp);raw=json.loads(s.read_text());meta=json.loads(m.read_text())
                 if case=='missing':(Path(tmp)/'case-0-off/stdout.txt').unlink()
@@ -105,6 +105,16 @@ class ImportTests(unittest.TestCase):
                 if case=='origin':meta.update(origin='hardware',gpu='GM107')
                 if case=='order':meta['pair_orders'][1]=['off','on']
                 if case=='path':raw['pairs'][0]['off']['run']='../escape'
+                if case=='config':(Path(tmp)/'case-0-off/stderr.txt').write_text('CONFIG reads=32 draws=1 rebind=0 dynamic=0 width=1280 height=720 validation=0\nPASS all pixels\n')
                 if case=='unfinished':(Path(tmp)/'case-0-off/exit-status.txt').write_text('1')
                 s.write_text(json.dumps(raw));m.write_text(json.dumps(meta))
                 with self.assertRaises((d.Invalid,OSError)):d.import_h2(s,tmp,m)
+    def test_cli_import_pipeline(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            summary,manifest=h2_fixture(tmp);out=Path(tmp)/'dataset.json'
+            cmd=[sys.executable,'-m','h3.dataset','import-h2',str(summary),'--runs',tmp,'--manifest',str(manifest),'--out',str(out)]
+            r=subprocess.run(cmd,capture_output=True,text=True)
+            self.assertEqual(r.returncode,0,r.stderr)
+            r=subprocess.run([sys.executable,'-m','h3.dataset','decisions',str(out)],capture_output=True,text=True)
+            self.assertEqual(r.returncode,0,r.stderr);table=json.loads(r.stdout)
+            self.assertFalse(table['driver_ready']);self.assertEqual(table['entries'][0]['scope'],'microbenchmark')
