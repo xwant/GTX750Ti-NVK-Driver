@@ -1,0 +1,28 @@
+test_cache_identity_and_compatibility (test_contract.ContractTests.test_cache_identity_and_compatibility) ... ok
+test_eligibility_and_absence_fallback (test_contract.ContractTests.test_eligibility_and_absence_fallback) ... ok
+test_invalid_tables (test_contract.ContractTests.test_invalid_tables) ... ok
+test_missing_identity (test_contract.ContractTests.test_missing_identity) ... ok
+test_bad_numbers (test_dataset.DatasetTests.test_bad_numbers) ... ok
+test_cli_roundtrip (test_dataset.DatasetTests.test_cli_roundtrip) ... ok
+test_deterministic_sort (test_dataset.DatasetTests.test_deterministic_sort) ... ok
+test_duplicate_and_cross_record_run (test_dataset.DatasetTests.test_duplicate_and_cross_record_run) ... ok
+test_origins_do_not_escalate (test_dataset.DatasetTests.test_origins_do_not_escalate) ... ok
+test_per_shader_needs_full_identity (test_dataset.DatasetTests.test_per_shader_needs_full_identity) ... ok
+test_schema_and_duplicate_json (test_dataset.DatasetTests.test_schema_and_duplicate_json) ... ok
+test_structural_failures (test_dataset.DatasetTests.test_structural_failures) ... ok
+test_table_never_driver_ready (test_dataset.DatasetTests.test_table_never_driver_ready) ... ok
+test_cli_import_pipeline (test_dataset.ImportTests.test_cli_import_pipeline) ... ok
+test_import_units_and_unknown_features (test_dataset.ImportTests.test_import_units_and_unknown_features) ... ok
+test_reject_incomplete_corrupt_and_origin (test_dataset.ImportTests.test_reject_incomplete_corrupt_and_origin) ... ok
+test_evaluation_does_not_train_tree (test_research.ResearchTests.test_evaluation_does_not_train_tree) ... ok
+test_insufficient_or_mixed_data (test_research.ResearchTests.test_insufficient_or_mixed_data) ... ok
+test_missing_feature_fallback (test_research.ResearchTests.test_missing_feature_fallback) ... ok
+test_permuted_input (test_research.ResearchTests.test_permuted_input) ... ok
+test_reproducible (test_research.ResearchTests.test_reproducible) ... ok
+test_same_shader_different_layouts_stay_together (test_research.ResearchTests.test_same_shader_different_layouts_stay_together) ... ok
+test_shader_or_scenario_connected_groups (test_research.ResearchTests.test_shader_or_scenario_connected_groups) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 1.817s
+
+OK

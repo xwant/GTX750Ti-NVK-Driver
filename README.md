@@ -47,3 +47,7 @@ bash build-cachyos.sh
 Каждый воспроизводимый результат фиксируем в [`docs/DEVLOG.md`](docs/DEVLOG.md), отдельные задачи — в GitHub Issues после создания репозитория. Для новых результатов указываем kernel version, используемый ICD, способ воспроизведения, kernel/KWin logs, итоги и откат. Не публикуем приватные токены, домашние пути с персональными данными, произвольные дампы памяти.
 
 Лицензии исходных частей определяются их SPDX/лицензиями; Mesa распространяется по своим лицензиям. Этот репозиторий содержит **патч**, а не копию всего дерева Mesa.
+
+## H3 dataset-v1 (13 November 2026)
+
+Offline dataset/import/validation and bounded tree research: [dataset](docs/H3_DATASET.md), [architecture](docs/H3_ARCHITECTURE.md), [validation](docs/H3_VALIDATION.md), [roadmap](docs/H3_ROADMAP.md), [CachyOS capture](docs/H3_CACHYOS.md). Run `python3 -m unittest discover -s h3/tests -v`. H3 is not integrated into NVK. Synthetic examples are explicitly labelled; no GPU speedup is claimed. Use dataset CLI instead of the permissive Phase-0 prototype for new evidence preparation.

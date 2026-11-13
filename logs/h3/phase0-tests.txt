@@ -1,0 +1,13 @@
+test_clear_gain (test_autotune.PolicyTests.test_clear_gain) ... ok
+test_duplicate_rejected (test_autotune.PolicyTests.test_duplicate_rejected) ... ok
+test_invalid_measurement (test_autotune.PolicyTests.test_invalid_measurement) ... ok
+test_key_includes_layout (test_autotune.PolicyTests.test_key_includes_layout) ... ok
+test_non_gm107_rejected (test_autotune.PolicyTests.test_non_gm107_rejected) ... ok
+test_regression (test_autotune.PolicyTests.test_regression) ... ok
+test_small_gain (test_autotune.PolicyTests.test_small_gain) ... ok
+test_too_few_pairs (test_autotune.PolicyTests.test_too_few_pairs) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK

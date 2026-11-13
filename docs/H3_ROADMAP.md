@@ -1,0 +1,18 @@
+# H3 roadmap
+
+## Completed in dataset-v1
+
+- Strict versioned paired datasets, H2 raw import with explicit provenance, origin/scope boundaries and canonical exports.
+- Baseline fallback/H2 heuristic/statistical/small-tree comparison with grouped splitting and independent evaluation pairs.
+- CPU reference table ABI with compatibility, bounded parsing, content cache identity and fail-closed lookup.
+- Separate H2 tooling audit and regression tests; neither main nor original experiment branches are rewritten.
+
+## Next priority: H3.3 real per-shader capture ABI
+
+Implement an **opt-in diagnostic-only Mesa patch** on clean H2 source: canonical late-NIR hash + full layout semantic digest + specialization/robustness/compiler-policy identity, plus actual static UBO loads, SM50 instructions/GPR/spills/fills/address-op metrics where supported. Explicitly emit unavailable fields as null. Add real NIR/compiler tests proving instrumentation does not alter output, deterministic hashes, and different layout/robustness keys. Do not enable runtime H3 table selection yet.
+
+Then: physical GM107 correctness and CTS for H2, audited base/off/on captures with fixed clocks/quality, Dota shader execution/hotness correlation, artifact review. Four synthetic microbenchmark configurations only establish measurement plumbing; they cannot justify a game model. Need many independent shader/layout families and titles/scenes, retaining failing and negative results.
+
+After sufficient real data: measure predictive errors on entirely unseen shader/game families, false-H2 cost, confidence and reproducibility. Separate baseline compiler changes from H2 policy. Only then design a small C policy reader and cache identity integration, prove fallback and bound memory/compile overhead. Keep all integration opt-in until hardware acceptance.
+
+No cloud AI in rendering. No online tuning, power-control changes or firmware work in this roadmap. Frequency control is outside H3's current scope and cannot compensate for missing correctness evidence.
