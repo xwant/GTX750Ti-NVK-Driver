@@ -1,0 +1,85 @@
+ninja: Entering directory `/workspace/scratch/908399f6f132/validation-base/build'
+[1/75] Generating src/git_sha1.h with a custom command
+[2/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl91c0.c.o
+[3/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl906f.c.o
+[4/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl85b5.c.o
+[5/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl90b5.c.o
+[6/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla0b5.c.o
+[7/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla06f.c.o
+[8/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla16f.c.o
+[9/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla140.c.o
+[10/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl9297.c.o
+[11/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla040.c.o
+[12/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl9039.c.o
+[13/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl902d.c.o
+[14/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla197.c.o
+[15/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clb06f.c.o
+[16/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla26f.c.o
+[17/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clb0b5.c.o
+[18/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl90c0.c.o
+[19/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc06f.c.o
+[20/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clb1c0.c.o
+[21/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla1c0.c.o
+[22/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clb197.c.o
+[23/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc1c0.c.o
+[24/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc1b5.c.o
+[25/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc197.c.o
+[26/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc097.c.o
+[27/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc0b5.c.o
+[28/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clb0c0.c.o
+[29/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla0c0.c.o
+[30/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla097.c.o
+[31/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc36f.c.o
+[32/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc46f.c.o
+[33/72] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/test_nvk_gm107_ubo.c.o
+[34/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clb097.c.o
+[35/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc3b5.c.o
+[36/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc56f.c.o
+[37/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc0c0.c.o
+[38/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc5b5.c.o
+[39/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc5b0.c.o
+[40/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc3c0.c.o
+[41/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc6b5.c.o
+[42/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc7b0.c.o
+[43/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc7b5.c.o
+[44/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc5c0.c.o
+[45/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc86f.c.o
+[46/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc6c0.c.o
+[47/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc96f.c.o
+[48/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc8b5.c.o
+[49/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc997.c.o
+[50/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc9b0.c.o
+[51/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc9c0.c.o
+[52/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc9b5.c.o
+[53/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clca6f.c.o
+[54/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clcab5.c.o
+[55/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc697.c.o
+[56/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cla297.c.o
+[57/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clcec0.c.o
+[58/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clcb97.c.o
+[59/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc597.c.o
+[60/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clce97.c.o
+[61/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc397.c.o
+[62/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clcdc0.c.o
+[63/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clcbc0.c.o
+[64/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc7c0.c.o
+[65/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clc797.c.o
+[66/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_cl9097.c.o
+[67/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/meson-generated_.._.._headers_nv_push_clcd97.c.o
+[68/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/test_nvk_shader_telemetry.c.o
+[69/72] Compiling C object src/nouveau/vulkan/test_nvk_shader_telemetry.p/.._headers_nv_push.c.o
+[70/72] Linking target src/nouveau/vulkan/test_nvk_gm107_ubo
+[71/72] Linking target src/nouveau/vulkan/test_nvk_mme
+[72/72] Linking target src/nouveau/vulkan/test_nvk_shader_telemetry
+1/7 nouveau - mesa:nil                  OK              0.01s   1 subtests passed
+2/7 nouveau - mesa:nak                  OK              0.01s   9 subtests passed
+3/7 nouveau - mesa:mme_builder          OK              0.01s
+4/7 nouveau - mesa:nvk_mme              OK              0.01s
+5/7 nouveau - mesa:nvk_gm107_ubo        OK              0.01s
+6/7 nouveau - mesa:nvk_shader_telemetry OK              0.01s
+7/7 nouveau - mesa:nvk_codegen_probe    OK              0.01s
+
+Ok:                7
+Fail:              0
+
+Full log written to /workspace/scratch/908399f6f132/validation-base/build/meson-logs/testlog.txt

@@ -51,3 +51,7 @@ bash build-cachyos.sh
 ## H3 dataset-v1 (13 November 2026)
 
 Offline dataset/import/validation and bounded tree research: [dataset](docs/H3_DATASET.md), [architecture](docs/H3_ARCHITECTURE.md), [validation](docs/H3_VALIDATION.md), [roadmap](docs/H3_ROADMAP.md), [CachyOS capture](docs/H3_CACHYOS.md). Run `python3 -m unittest discover -s h3/tests -v`. H3 is not integrated into NVK. Synthetic examples are explicitly labelled; no GPU speedup is claimed. Use dataset CLI instead of the permissive Phase-0 prototype for new evidence preparation.
+
+## H3.3 experimental diagnostics and CI
+
+This branch adds opt-in real NIR/NAK compiler telemetry, not H3 runtime policy selection. See [H3_TELEMETRY](docs/H3_TELEMETRY.md), [CPU/compiler validation](docs/H3_VALIDATION.md) and the unified [hardware handoff](docs/HARDWARE_VALIDATION.md). The independent H6 percent simulator lives on `experiment/h6-percent-simulation`; it does not control hardware.

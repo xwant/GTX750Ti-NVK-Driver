@@ -1,0 +1,5 @@
+PASS actual source specialization canonicalization, entrypoint and malformed ranges
+PASS deterministic identity and context separation
+PASS telemetry off/on exact SM50 machine code, metadata, cbuf map and compiler flags
+PASS telemetry off/on exact SM50 machine code, metadata, cbuf map and compiler flags
+PASS telemetry off/on exact SM50 machine code, metadata, cbuf map and compiler flags

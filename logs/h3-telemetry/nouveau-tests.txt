@@ -1,0 +1,17 @@
+ninja: Entering directory `/workspace/scratch/908399f6f132/mesa-h3/build-h3'
+[1/9] Generating src/git_sha1.h with a custom command
+[2/5] Linking target src/nouveau/mme/mme_builder_test
+[3/5] Linking target src/nouveau/vulkan/test_nvk_mme
+[4/5] Compiling Rust source ../src/nouveau/nil/lib.rs
+[5/5] Compiling Rust source ../src/nouveau/compiler/nak/lib.rs
+1/6 nouveau - mesa:nil                  OK              0.01s   1 subtests passed
+2/6 nouveau - mesa:nak                  OK              0.01s   9 subtests passed
+3/6 nouveau - mesa:mme_builder          OK              0.02s
+4/6 nouveau - mesa:nvk_mme              OK              0.02s
+5/6 nouveau - mesa:nvk_shader_telemetry OK              0.02s
+6/6 nouveau - mesa:nvk_codegen_probe    OK              0.03s
+
+Ok:                6
+Fail:              0
+
+Full log written to /workspace/scratch/908399f6f132/mesa-h3/build-h3/meson-logs/testlog.txt

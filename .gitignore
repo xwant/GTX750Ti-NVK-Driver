@@ -25,3 +25,11 @@ logs/options-patched.json
 __pycache__/
 *.pyc
 h3/results/
+work-h3/
+hardware-results/
+_audit/
+logs/h3-telemetry/build*.txt
+logs/h3-telemetry/base-validation.txt
+logs/h3-telemetry/configure.txt
+logs/h3-telemetry/codegen-*.txt
+logs/h3-telemetry/codegen-*.stderr

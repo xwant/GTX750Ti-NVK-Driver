@@ -26,3 +26,9 @@ Shader key includes actual canonical late NIR, full descriptor-layout semantic d
 6. Tests must call real NIR lowering, assert original slots, compile SM50, verify output under robustness/layout/pipeline transitions, and run GPU correctness/CTS before enabling experimental table consumption. CPU contract tests alone are not a driver implementation.
 
 Python reference lookup demonstrates semantics and failure cases; its object memory and timings are not measurements of future C overhead. No model/table generated here is production-ready. Exact-entry tables are preferred to running even a small tree in the driver until evidence supports generalization.
+
+## H3.3 diagnostic boundary
+
+Implemented separately in `patches/h3`: [identity ABI and real compiler metrics](H3_TELEMETRY.md). Canonical source/specialization identity crosses the generic Vulkan compile-info boundary. NVK snapshots specialized input NIR/layout/context and late NIR; NAK's final bin supplies static counters and code digest. This patch chooses no policy and changes no cache UUID policy.
+
+The diagnostic ABI uses BLAKE3-256 and a source/context-rich `shader_key`, whereas the old Python future-policy ABI names SHA256 components. They are intentionally incompatible. Do not relabel fields to bypass validation. A future versioned deployment contract must consume the exact new key and require actual build/transform compatibility plus reviewed GPU evidence. Compiler captures currently have zero GPU timing/hotness labels.

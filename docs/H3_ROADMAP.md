@@ -16,3 +16,13 @@ Then: physical GM107 correctness and CTS for H2, audited base/off/on captures wi
 After sufficient real data: measure predictive errors on entirely unseen shader/game families, false-H2 cost, confidence and reproducibility. Separate baseline compiler changes from H2 policy. Only then design a small C policy reader and cache identity integration, prove fallback and bound memory/compile overhead. Keep all integration opt-in until hardware acceptance.
 
 No cloud AI in rendering. No online tuning, power-control changes or firmware work in this roadmap. Frequency control is outside H3's current scope and cannot compensate for missing correctness evidence.
+
+## Completed H3.3 diagnostic implementation
+
+- Actual canonical module/entrypoint/specialization source identity, post-link input NIR and indexed descriptor-layout/context key.
+- Late-NIR and compiled-artifact identities, actual NAK counters, no policy inference.
+- Strict static capture importer; separate CPU, library evidence and hardware smoke statuses.
+- GitHub Actions matrix for base/H2/H3/H2+H3; exact fixture code comparisons.
+- Unified hardware checklist and safe handoff collector.
+
+Next: execute the hardware checklist, broaden real compiler capture coverage, add a GPU-free SPIR-V replay corpus across pipeline-layout/specialization/robustness variants and correlate runtime shader hotness before creating performance-labelled per-shader datasets. Final machine address-op counting remains unavailable. No H3 driver policy reader is enabled.

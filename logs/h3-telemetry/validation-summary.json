@@ -1,0 +1,19 @@
+{
+  "schema": "gm107.h33.validation.v1",
+  "mesa": "8e87a503ebd91408c88596d1b9eeb5f4c0b2088d",
+  "cpu_sets": {
+    "base": 5,
+    "h2": 6,
+    "h3": 6,
+    "h2_h3": 7
+  },
+  "h3_unit_tests": 35,
+  "h3_phase0_tests": 8,
+  "h2_audit_unit_tests": 15,
+  "optimized_python": "PASS",
+  "machine_code_comparison": "PASS for six fixtures with H2 policy off and on",
+  "workflow_lint": "actionlint 1.7.12 PASS",
+  "gpu_hardware": "NOT_RUN",
+  "steam_wsi": "NOT_RUN",
+  "cts": "NOT_RUN"
+}

@@ -1,0 +1,14 @@
+{
+  "scope": "CPU SM50 six shader fixtures, not GPU execution",
+  "sha256": {
+    "codegen-base.txt": "d7e3782e02c57b4ed2d6a42324138c928f1a1e7ce378ce9a61a4197e7dba05f2",
+    "codegen-off.txt": "d7e3782e02c57b4ed2d6a42324138c928f1a1e7ce378ce9a61a4197e7dba05f2",
+    "codegen-on.txt": "d7e3782e02c57b4ed2d6a42324138c928f1a1e7ce378ce9a61a4197e7dba05f2",
+    "codegen-h2.txt": "d7e3782e02c57b4ed2d6a42324138c928f1a1e7ce378ce9a61a4197e7dba05f2",
+    "codegen-h2-h3.txt": "d7e3782e02c57b4ed2d6a42324138c928f1a1e7ce378ce9a61a4197e7dba05f2",
+    "codegen-h2-policy-on.txt": "bee6d6906f617fd73ae09c7624dfa54c58df38418ea04bbf4036c029fbe11c99",
+    "codegen-h2-h3-policy-on.txt": "bee6d6906f617fd73ae09c7624dfa54c58df38418ea04bbf4036c029fbe11c99",
+    "codegen-h2-h3-policy-diag.txt": "bee6d6906f617fd73ae09c7624dfa54c58df38418ea04bbf4036c029fbe11c99"
+  },
+  "comparisons": "PASS"
+}

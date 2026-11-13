@@ -1,0 +1,546 @@
+[0/1] Regenerating build files
+The Meson build system
+Version: 1.12.1
+Source dir: /workspace/scratch/908399f6f132/validation-base/mesa
+Build dir: /workspace/scratch/908399f6f132/validation-base/build
+Build type: native build
+Project name: mesa
+Project version: 26.2.6
+C compiler for the host machine: cc (gcc 14.2.0 "cc (Debian 14.2.0-19) 14.2.0")
+C linker for the host machine: cc ld.bfd 2.44
+C++ compiler for the host machine: c++ (gcc 14.2.0 "c++ (Debian 14.2.0-19) 14.2.0")
+C++ linker for the host machine: c++ ld.bfd 2.44
+Host machine cpu family: x86_64
+Host machine cpu: x86_64
+Checking for size of "void*" : 8 (cached)
+Checking if "-mtls-dialect=gnu2" runs: YES
+Checking if "split TLSDESC" links: YES (cached)
+Dependency libglvnd for host machine skipped: feature glvnd disabled
+Program glslangValidator found: YES (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/glslangValidator)
+Dependency libva for host machine skipped: feature gallium-va disabled
+../mesa/meson.build:872: WARNING: add_languages is missing native:, assuming languages are wanted for both host and build.
+Rust compiler for the host machine: rustc -C linker=cc (rustc 1.85.1 "1.85.1")
+Rust linker for the host machine:  ld.bfd 2.44
+Program bindgen found: YES (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/bindgen)
+Program python3.16 found: NO
+Program python3.15 found: NO
+Program python3.14 found: NO
+Program python3.13 found: YES 3.13.5 3.13.5 (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/python3.13)
+Program python3.12 found: YES 3.12.14 3.12.14 (/workspace/scratch/908399f6f132/toolchain/venv/bin/python3.12)
+Fetching value of define "ETIME" : 62 (cached)
+Compiler for C supports arguments -gsplit-dwarf: YES (cached)
+Compiler for C supports link arguments -Wl,--gdb-index: NO (cached)
+Checking for function "bswap32" : YES (cached)
+Checking for function "bswap64" : YES (cached)
+Checking for function "clz" : YES (cached)
+Checking for function "clzll" : YES (cached)
+Checking for function "ctz" : YES (cached)
+Checking for function "expect" : YES (cached)
+Checking for function "ffs" : YES (cached)
+Checking for function "ffsll" : YES (cached)
+Checking for function "popcount" : YES (cached)
+Checking for function "popcountll" : YES (cached)
+Checking for function "unreachable" : YES (cached)
+Checking for function "types_compatible_p" : YES (cached)
+Checking for function "__builtin_add_overflow" : YES (cached)
+Checking for function "__builtin_add_overflow_p" : YES (cached)
+Checking for function "__builtin_sub_overflow_p" : YES (cached)
+Checking for function "__builtin_arm_get_fpscr" : NO (cached)
+Checking for function "__builtin_arm_set_fpscr" : NO (cached)
+Checking for function "__builtin_aarch64_get_fpcr" : NO (cached)
+Checking for function "__builtin_aarch64_set_fpcr" : NO (cached)
+Compiler for C supports function attribute const: YES (cached)
+Compiler for C supports function attribute flatten: YES (cached)
+Compiler for C supports function attribute malloc: YES (cached)
+Compiler for C supports function attribute pure: YES (cached)
+Compiler for C supports function attribute unused: YES (cached)
+Compiler for C supports function attribute warn_unused_result: YES (cached)
+Compiler for C supports function attribute weak: YES (cached)
+Compiler for C supports function attribute format: YES (cached)
+Compiler for C supports function attribute packed: YES (cached)
+Compiler for C supports function attribute returns_nonnull: YES (cached)
+Compiler for C supports function attribute alias: YES (cached)
+Compiler for C supports function attribute noreturn: YES (cached)
+Compiler for C supports function attribute optimize: YES (cached)
+Compiler for C supports function attribute cold: YES (cached)
+Compiler for C supports function attribute visibility:hidden: YES (cached)
+Checking if "__uint128_t" compiles: YES (cached)
+Checking for function "reallocarray" : YES (cached)
+Checking for function "fmemopen" : YES (cached)
+Checking if "gc-sections" links: YES (cached)
+Compiler for C supports arguments -Werror=implicit-function-declaration: YES (cached)
+Compiler for C supports arguments -Werror=missing-prototypes: YES (cached)
+Compiler for C supports arguments -Werror=return-type: YES (cached)
+Compiler for C supports arguments -Werror=empty-body: YES (cached)
+Compiler for C supports arguments -Werror=incompatible-pointer-types: YES (cached)
+Compiler for C supports arguments -Werror=int-conversion: YES (cached)
+Compiler for C supports arguments -Wimplicit-fallthrough: YES (cached)
+Compiler for C supports arguments -Wmisleading-indentation: YES (cached)
+Compiler for C supports arguments -Wno-error=maybe-uninitialized: YES (cached)
+Compiler for C supports arguments -Wno-missing-field-initializers: YES (cached)
+Compiler for C supports arguments -Wno-format-truncation: YES (cached)
+Compiler for C supports arguments -Wno-nonnull-compare: YES (cached)
+Compiler for C supports arguments -fno-math-errno: YES (cached)
+Compiler for C supports arguments -fno-trapping-math: YES (cached)
+Compiler for C supports arguments -Qunused-arguments: NO (cached)
+Compiler for C supports arguments -fno-common: YES (cached)
+Compiler for C supports arguments -Wno-unknown-pragmas: YES (cached)
+Compiler for C supports arguments -Wno-microsoft-enum-value: NO (cached)
+Compiler for C supports arguments -Wno-unused-function: YES (cached)
+Compiler for C supports arguments -Werror=format: YES (cached)
+Compiler for C supports arguments -Wformat-security: YES (cached)
+Compiler for C supports arguments -Werror=thread-safety: NO (cached)
+Compiler for C supports arguments -ffunction-sections: YES (cached)
+Compiler for C supports arguments -fdata-sections: YES (cached)
+Compiler for C++ supports arguments -Werror=return-type: YES (cached)
+Compiler for C++ supports arguments -Werror=empty-body: YES (cached)
+Compiler for C++ supports arguments -Wmisleading-indentation: YES (cached)
+Compiler for C++ supports arguments -Wno-error=maybe-uninitialized: YES (cached)
+Compiler for C++ supports arguments -Wno-non-virtual-dtor: YES (cached)
+Compiler for C++ supports arguments -Wno-missing-field-initializers: YES (cached)
+Compiler for C++ supports arguments -Wno-format-truncation: YES (cached)
+Compiler for C++ supports arguments -fno-math-errno: YES (cached)
+Compiler for C++ supports arguments -fno-trapping-math: YES (cached)
+Compiler for C++ supports arguments -Qunused-arguments: NO (cached)
+Compiler for C++ supports arguments -flifetime-dse=1: YES (cached)
+Compiler for C++ supports arguments -Wno-unknown-pragmas: YES (cached)
+Compiler for C++ supports arguments -Wno-microsoft-enum-value: NO (cached)
+Compiler for C++ supports arguments -Werror=format: YES (cached)
+Compiler for C++ supports arguments -Wformat-security: YES (cached)
+Compiler for C++ supports arguments -ffunction-sections: YES (cached)
+Compiler for C++ supports arguments -fdata-sections: YES (cached)
+Compiler for C supports arguments -Wno-override-init: YES (cached)
+Compiler for C supports arguments -Wno-initializer-overrides: NO (cached)
+Compiler for C supports arguments -Werror=pointer-arith: YES (cached)
+Compiler for C supports arguments -Werror=vla: YES (cached)
+Compiler for C supports arguments -Werror=gnu-empty-initializer: NO (cached)
+Compiler for C supports arguments -Wgnu-pointer-arith: NO (cached)
+Compiler for C++ supports arguments -Werror=pointer-arith: YES (cached)
+Compiler for C++ supports arguments -Werror=vla: YES (cached)
+Compiler for C++ supports arguments -Werror=gnu-empty-initializer: NO (cached)
+Compiler for C++ supports arguments -Wgnu-pointer-arith: NO (cached)
+Compiler for C supports arguments -Werror=date-time: YES (cached)
+Compiler for C supports arguments -Werror=gnu-alignof-expression: NO (cached)
+Compiler for C supports arguments -Werror=ignored-qualifiers: YES (cached)
+Compiler for C supports arguments -Werror=implicit-fallthrough: YES (cached)
+Compiler for C supports arguments -Werror=int-conversion: YES (cached)
+Compiler for C supports arguments -Werror=missing-prototypes: YES (cached)
+Compiler for C supports arguments -Werror=pragma-pack: NO (cached)
+Compiler for C supports arguments -Werror=pragma-pack-suspicious-include: NO (cached)
+Compiler for C supports arguments -Werror=sizeof-array-div: YES (cached)
+Compiler for C supports arguments -Werror=string-plus-int: NO (cached)
+Compiler for C supports arguments -Werror=unreachable-code-loop-increment: NO (cached)
+Compiler for C++ supports arguments -D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS: YES (cached)
+Compiler for C++ supports arguments -Werror=date-time: YES (cached)
+Compiler for C++ supports arguments -Werror=gnu-alignof-expression: NO (cached)
+Compiler for C++ supports arguments -Werror=ignored-qualifiers: YES (cached)
+Compiler for C++ supports arguments -Werror=implicit-fallthrough: YES (cached)
+Compiler for C++ supports arguments -Werror=pragma-pack: NO (cached)
+Compiler for C++ supports arguments -Werror=pragma-pack-suspicious-include: NO (cached)
+Compiler for C++ supports arguments -Werror=sizeof-array-div: YES (cached)
+Compiler for C++ supports arguments -Werror=string-plus-int: NO (cached)
+Compiler for C++ supports arguments -Werror=unreachable-code-loop-increment: NO (cached)
+Compiler for C++ supports arguments -Werror=missing-declarations: YES (cached)
+Checking for function "__builtin_ia32_clflushopt" : YES (cached)
+Checking if "GCC atomic builtins" compiles: YES (cached)
+Checking if "GCC atomic builtins required -latomic" links: YES (cached)
+Checking if "GCC 64bit atomics" with dependency  links: YES (cached)
+Library ws2_32 found: NO
+Header "sys/sysmacros.h" has symbol "major" : YES (cached)
+Header "sys/sysmacros.h" has symbol "minor" : YES (cached)
+Header "sys/sysmacros.h" has symbol "makedev" : YES (cached)
+Header "sys/mkdev.h" has symbol "major" : NO (cached)
+Check usable header "sched.h" : YES (cached)
+Checking for function "sched_getaffinity" : YES (cached)
+Check usable header "xlocale.h" : NO (cached)
+Check usable header "linux/futex.h" : YES (cached)
+Check usable header "endian.h" : YES (cached)
+Check usable header "dlfcn.h" : YES (cached)
+Check usable header "sys/shm.h" : YES (cached)
+Check usable header "cet.h" : YES (cached)
+Check usable header "pthread_np.h" : NO (cached)
+Check usable header "poll.h" : YES (cached)
+Check usable header "sys/inotify.h" : YES (cached)
+Check usable header "linux/udmabuf.h" : YES (cached)
+Checking for function "strtof" : YES (cached)
+Checking for function "mkostemp" : YES (cached)
+Checking for function "memfd_create" : YES (cached)
+Checking for function "random_r" : YES (cached)
+Checking for function "flock" : YES (cached)
+Checking for function "strtok_r" : YES (cached)
+Checking for function "getrandom" : YES (cached)
+Checking for function "qsort_s" : NO (cached)
+Checking for function "posix_fallocate" : YES (cached)
+Checking for function "secure_getenv" : YES (cached)
+Checking for function "sysconf" : YES (cached)
+Compiler for C++ supports arguments -fno-permissive: YES (cached)
+Checking if "GNU qsort_r" links: YES (cached)
+Header "time.h" has symbol "struct timespec" : YES (cached)
+Checking for function "thrd_create" : YES (cached)
+Header "errno.h" has symbol "program_invocation_name" : YES (cached)
+Header "math.h" has symbol "issignaling" : YES (cached)
+Checking for function "posix_memalign" : YES (cached)
+Checking whether type "struct dirent" has member "d_type" : YES (cached)
+Checking if "strtod has locale support" links: YES (cached)
+Checking if "Bsymbolic" links: YES (cached)
+Checking if "version-script" links: YES (cached)
+Checking if "dynamic-list" links: YES (cached)
+Compiler for C supports link arguments -Wl,--build-id=sha1: YES (cached)
+Checking for function "dlopen" : YES (cached)
+Checking for function "dladdr" with dependency : YES (cached)
+Checking for function "dl_iterate_phdr" : YES (cached)
+Checking for function "clock_gettime" : YES (cached)
+Dependency zlib for host machine found: YES 1.3.1 (cached)
+Found pkg-config: YES (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/pkg-config) 1.8.1
+Did not find CMake 'cmake'
+Found CMake: NO
+Run-time dependency libdisplay-info found: NO  (tried pkg-config and cmake)
+Dependency libzstd for host machine found: YES 1.5.7 (cached)
+Dependency threads for host machine found: YES unknown (cached)
+Checking for function "pthread_setaffinity_np" with dependency threads: YES (cached)
+Dependency expat for host machine found: YES 2.9.0 (cached)
+Library m found: YES
+Dependency libdrm for host machine found: YES 2.4.124 (cached)
+Dependency libudev for host machine found: YES 257 (cached)
+llvm-config found: YES (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/llvm-config-19) 19.1.7
+Run-time dependency LLVM (modules: bitwriter, core, coverage, engine, executionengine, instcombine, irreader, libdriver, linker, lto, mcdisassembler, mcjit, native, option, scalaropts, target, transformutils, abi(missing but optional), all-targets, coroutines, frontenddriver, frontendhlsl, lto, windowsdriver) found: YES 19.1.7
+Dependency LLVMSPIRVLib for host machine found: YES 19.1.0.0 (cached)
+Dependency SPIRV-Tools for host machine found: YES 2025.1.1 (cached)
+Library clang-cpp found: YES
+Run-time dependency lua54 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua5.4 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua-5.4 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua53 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua5.3 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua-5.3 found: NO  (tried pkg-config and cmake)
+Run-time dependency lua found: NO  (tried pkg-config and cmake)
+Dependency libelf for host machine found: YES 0.192 (cached)
+Dependency valgrind for host machine skipped: feature valgrind disabled
+Program bison found: YES (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/bison)
+Program bison found: YES 3.8.2 3.8.2 (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/bison)
+Program flex found: YES (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/flex)
+Program ln found: YES (/usr/bin/ln)
+Dependency libunwind for host machine skipped: feature libunwind disabled
+Dependency openmp for host machine found: YES 4.5 (cached)
+Library sensors found: NO
+Program nm found: YES (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/nm)
+Program symbols-check.py found: YES (/workspace/scratch/908399f6f132/toolchain/venv/bin/python3 /workspace/scratch/908399f6f132/validation-base/mesa/bin/symbols-check.py)
+Program install_megadrivers.py found: YES (/workspace/scratch/908399f6f132/toolchain/venv/bin/python3 /workspace/scratch/908399f6f132/validation-base/mesa/bin/install_megadrivers.py)
+Checking for size of "void *" : 8 (cached)
+Compiler for C supports arguments -Wno-error: YES (cached)
+Program xmllint found: NO
+Compiler for C++ supports arguments -std=c++2a: YES (cached)
+Compiler for C supports arguments -Wno-misleading-indentation: YES (cached)
+Checking whether type "spvtools::LinkerOptions" has member "SetAllowPtrTypeMismatch(true)" with dependency SPIRV-Tools: YES (cached)
+Compiler for C supports link arguments -fPIC: YES (cached)
+Program decode.py found: YES (/workspace/scratch/908399f6f132/validation-base/mesa/src/compiler/isaspec/decode.py)
+Program encode.py found: YES (/workspace/scratch/908399f6f132/validation-base/mesa/src/compiler/isaspec/encode.py)
+Program bindgen found: YES (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/bindgen)
+Compiler for C supports arguments -Wno-missing-prototypes: YES (cached)
+../mesa/src/compiler/rust/meson.build:117: WARNING: include_directories sandbox violation!
+The project is trying to access the directory '../../../../build' which belongs to a different
+subproject. This is a problem as it hardcodes the relative paths of these two projects.
+This makes it impossible to compile the project in any other directory layout and also
+prevents the subproject from changing its own directory layout.
+
+Instead of poking directly at the internals the subproject should be executed and
+it should set a variable that the caller can then use. Something like:
+
+# In subproject
+some_dep = declare_dependency(include_directories: include_directories('include'))
+
+# In subproject wrap file
+[provide]
+some = some_dep
+
+# In parent project
+some_dep = dependency('some')
+executable(..., dependencies: [some_dep])
+
+This warning will become a hard error in a future Meson release.
+
+Run-time dependency syn found: NO  (tried pkg-config and cmake)
+Cleaning... 0 files.
+Looking for a fallback subproject for the dependency syn
+
+Executing subproject syn-2-rs for machine: host
+
+syn-2-rs| Project name: syn
+syn-2-rs| Project version: 2.0.87
+syn-2-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.85.1 "1.85.1")
+syn-2-rs| Rust linker for the host machine:  ld.bfd 2.44
+
+Executing subproject syn-2-rs:unicode-ident-1-rs for machine: host
+
+unicode-ident-1-rs| Project name: unicode-ident
+unicode-ident-1-rs| Project version: 1.0.12
+unicode-ident-1-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.85.1 "1.85.1")
+unicode-ident-1-rs| Rust linker for the host machine:  ld.bfd 2.44
+unicode-ident-1-rs| Build targets in project: 74
+unicode-ident-1-rs| Subproject unicode-ident-1-rs finished.
+
+
+Executing subproject syn-2-rs:quote-1-rs for machine: host
+
+quote-1-rs| Project name: quote
+quote-1-rs| Project version: 1.0.35
+quote-1-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.85.1 "1.85.1")
+quote-1-rs| Rust linker for the host machine:  ld.bfd 2.44
+
+Executing subproject syn-2-rs:quote-1-rs:proc-macro2-1-rs for machine: host
+
+proc-macro2-1-rs| Project name: proc-macro2
+proc-macro2-1-rs| Project version: 1.0.86
+proc-macro2-1-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.85.1 "1.85.1")
+proc-macro2-1-rs| Rust linker for the host machine:  ld.bfd 2.44
+proc-macro2-1-rs| Build targets in project: 75
+proc-macro2-1-rs| Subproject proc-macro2-1-rs finished.
+
+quote-1-rs| Build targets in project: 76
+quote-1-rs| Subproject quote-1-rs finished.
+
+syn-2-rs| Build targets in project: 77
+syn-2-rs| Subproject syn-2-rs finished.
+
+Dependency syn for host machine from subproject subprojects/syn-2.0.87 found: YES 2.0.87
+Compiler for C supports arguments -Wno-gnu-variable-sized-type-not-at-end: NO (cached)
+Program cbindgen found: YES 0.27.0 0.27.0 (/workspace/scratch/908399f6f132/toolchain/root/usr/bin/cbindgen)
+Run-time dependency paste found: NO  (tried pkg-config and cmake)
+Looking for a fallback subproject for the dependency paste
+
+Executing subproject paste-1-rs for machine: host
+
+paste-1-rs| Project name: paste
+paste-1-rs| Project version: 1.0.14
+paste-1-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.85.1 "1.85.1")
+paste-1-rs| Rust linker for the host machine:  ld.bfd 2.44
+paste-1-rs| Build targets in project: 342
+paste-1-rs| Subproject paste-1-rs finished.
+
+Dependency paste for host machine from subproject subprojects/paste-1.0.14 found: YES 1.0.14
+Dependency paste for host machine found: YES 1.0.14 (cached)
+Run-time dependency rustc-hash found: NO  (tried pkg-config and cmake)
+Looking for a fallback subproject for the dependency rustc-hash
+
+Executing subproject rustc-hash-2-rs for machine: host
+
+rustc-hash-2-rs| Project name: rustc_hash
+rustc-hash-2-rs| Project version: 2.1.1
+rustc-hash-2-rs| Rust compiler for the host machine: rustc -C linker=cc (rustc 1.85.1 "1.85.1")
+rustc-hash-2-rs| Rust linker for the host machine:  ld.bfd 2.44
+rustc-hash-2-rs| Build targets in project: 353
+rustc-hash-2-rs| Subproject rustc-hash-2-rs finished.
+
+Dependency rustc-hash for host machine from subproject subprojects/rustc-hash-2.1.1 found: YES 2.1.1
+Program sphinx-build skipped: feature html-docs disabled
+Build targets in project: 379
+NOTICE: Future-deprecated features used:
+ * 1.11.0: {'should_fail arg in test'}
+
+mesa 26.2.6
+
+  Directories
+    prefix            : /usr/local
+    libdir            : lib/x86_64-linux-gnu
+    includedir        : include
+
+  Common C and C++ arguments
+    c_cpp_args        : -mtls-dialect=gnu2
+
+  OpenGL
+    OpenGL            : NO
+    ES1               : NO
+    ES2               : NO
+    GLVND             : NO
+
+  DRI
+    Platform          : drm
+    Driver dir        : /usr/local/lib/x86_64-linux-gnu/dri
+
+  GLX
+    Enabled           : NO
+    Provider          : None
+
+  EGL
+    Enabled           : NO
+
+  GBM
+    Enabled           : NO
+
+  Vulkan
+    Drivers           : nouveau
+    Platforms         :
+    ICD dir           : share/vulkan/icd.d
+    Intel Ray tracing : NO
+
+  Video
+    Codecs            : all_free av1dec av1enc vp9dec mpeg12dec jpegdec
+    APIs              : vulkan
+    Encoding          : YES
+
+  LLVM
+    Required          : enabled
+    Version           : 19.1.7
+
+  Gallium
+    Enabled           : NO
+
+  Perfetto
+    Enabled           : NO
+
+  Teflon (TensorFlow Lite delegate)
+    Enabled           : NO
+
+  Subprojects (for host machine)
+    paste-1-rs        : YES
+    proc-macro2-1-rs  : YES (from syn-2-rs => quote-1-rs)
+    quote-1-rs        : YES (from syn-2-rs)
+    rustc-hash-2-rs   : YES
+    syn-2-rs          : YES
+    unicode-ident-1-rs: YES (from syn-2-rs)
+
+  User defined options
+    b_ndebug          : false
+    build-tests       : true
+    buildtype         : debugoptimized
+    egl               : disabled
+    gallium-drivers   : []
+    gbm               : disabled
+    gles1             : disabled
+    gles2             : disabled
+    glx               : disabled
+    libunwind         : disabled
+    opengl            : false
+    platforms         : []
+    valgrind          : disabled
+    vulkan-drivers    : nouveau
+
+Found ninja-1.13.2.git.kitware.jobserver-pipe-1 at /workspace/scratch/908399f6f132/toolchain/venv/bin/ninja
+ninja: no work to do.
+ninja: Entering directory `/workspace/scratch/908399f6f132/validation-base/build'
+[1/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl90b5.c.o
+[2/115] Generating src/git_sha1.h with a custom command
+[3/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl91c0.c.o
+[4/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl906f.c.o
+[5/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla0b5.c.o
+[6/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla040.c.o
+[7/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl85b5.c.o
+[8/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl9039.c.o
+[9/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl9297.c.o
+[10/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_buffer.c.o
+[11/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl902d.c.o
+[12/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl90c0.c.o
+[13/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_buffer_view.c.o
+[14/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cmd_pool.c.o
+[15/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cmd_clear.c.o
+[16/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cmd_copy.c.o
+[17/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cmd_meta.c.o
+[18/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_descriptor_set_layout.c.o
+[19/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cmd_buffer.c.o
+[20/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_descriptor_set.c.o
+[21/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cmd_dispatch.c.o
+[22/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_device_memory.c.o
+[23/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cubin.c.o
+[24/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_descriptor_table.c.o
+[25/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_edb_bview_cache.c.o
+[26/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_format.c.o
+[27/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_heap.c.o
+[28/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_device.c.o
+[29/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_event.c.o
+[30/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_instance.c.o
+[31/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_indirect_execution_set.c.o
+[32/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_mem_arena.c.o
+[33/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cmd_indirect.c.o
+[34/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_host_copy.c.o
+[35/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_image_view.c.o
+[36/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_mem_stream.c.o
+[37/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cl9097.c.o
+[38/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_sampler.c.o
+[39/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_queue.c.o
+[40/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_wsi.c.o
+[41/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_upload_queue.c.o
+[42/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvkmd_nouveau_nvkmd_nouveau_ctx.c.o
+[43/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvkmd_nouveau_nvkmd_nouveau_pdev.c.o
+[44/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/layers_nvk_app_workarounds.c.o
+[45/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_image.c.o
+[46/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla06f.c.o
+[47/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_physical_device.c.o
+[48/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla140.c.o
+[49/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvkmd_nouveau_nvkmd_nouveau_mem.c.o
+[50/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvkmd_nouveau_nvkmd_nouveau_va.c.o
+[51/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvkmd_nouveau_nvkmd_nouveau_dev.c.o
+[52/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla16f.c.o
+[53/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvkmd_nvkmd.c.o
+[54/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla26f.c.o
+[55/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clb06f.c.o
+[56/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla197.c.o
+[57/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla1c0.c.o
+[58/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clb0b5.c.o
+[59/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clb1c0.c.o
+[60/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc06f.c.o
+[61/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clb0c0.c.o
+[62/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_query_pool.c.o
+[63/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc097.c.o
+[64/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc1b5.c.o
+[65/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc197.c.o
+[66/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_nir_lower_descriptors.c.o
+[67/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc1c0.c.o
+[68/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc0b5.c.o
+[69/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clb197.c.o
+[70/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc36f.c.o
+[71/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla0c0.c.o
+[72/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla097.c.o
+[73/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc3b5.c.o
+[74/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc0c0.c.o
+[75/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc46f.c.o
+[76/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc56f.c.o
+[77/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_cmd_draw.c.o
+[78/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc5b5.c.o
+[79/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc5b0.c.o
+[80/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc6b5.c.o
+[81/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clb097.c.o
+[82/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc7b0.c.o
+[83/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc7b5.c.o
+[84/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_cla297.c.o
+[85/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc6c0.c.o
+[86/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc86f.c.o
+[87/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc3c0.c.o
+[88/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc7c0.c.o
+[89/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc8b5.c.o
+[90/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc5c0.c.o
+[91/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc9c0.c.o
+[92/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc9b0.c.o
+[93/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clca6f.c.o
+[94/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc9b5.c.o
+[95/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc96f.c.o
+[96/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc997.c.o
+[97/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clcab5.c.o
+[98/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clcb97.c.o
+[99/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clcec0.c.o
+[100/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc397.c.o
+[101/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clce97.c.o
+[102/115] Compiling C object src/nouveau/vulkan/libnvk.a.p/nvk_shader.c.o
+[103/115] Linking static target src/nouveau/vulkan/libnvk.a
+[104/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc597.c.o
+[105/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clcbc0.c.o
+[106/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clcdc0.c.o
+[107/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc797.c.o
+[108/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clc697.c.o
+[109/115] Compiling C object src/nouveau/vulkan/test_nvk_codegen_probe.p/test_nvk_codegen_probe.c.o
+[110/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/meson-generated_.._.._headers_nv_push_clcd97.c.o
+[111/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/test_nvk_gm107_ubo.c.o
+[112/115] Compiling C object src/nouveau/vulkan/test_nvk_gm107_ubo.p/.._headers_nv_push.c.o
+[113/115] Linking target src/nouveau/vulkan/test_nvk_mme
+[114/115] Linking target src/nouveau/vulkan/test_nvk_codegen_probe
+[115/115] Linking target src/nouveau/vulkan/test_nvk_gm107_ubo
+1/6 nouveau - mesa:nil               OK              0.01s   1 subtests passed
+2/6 nouveau - mesa:nak               OK              0.01s   9 subtests passed
+3/6 nouveau - mesa:mme_builder       OK              0.01s
+4/6 nouveau - mesa:nvk_mme           OK              0.01s
+5/6 nouveau - mesa:nvk_gm107_ubo     OK              0.01s
+6/6 nouveau - mesa:nvk_codegen_probe OK              0.01s
+
+Ok:                6
+Fail:              0
+
+Full log written to /workspace/scratch/908399f6f132/validation-base/build/meson-logs/testlog.txt

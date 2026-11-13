@@ -1,0 +1,40 @@
+test_cache_identity_and_compatibility (test_contract.ContractTests.test_cache_identity_and_compatibility) ... ok
+test_eligibility_and_absence_fallback (test_contract.ContractTests.test_eligibility_and_absence_fallback) ... ok
+test_invalid_tables (test_contract.ContractTests.test_invalid_tables) ... ok
+test_missing_identity (test_contract.ContractTests.test_missing_identity) ... ok
+test_hardware_import_preserves_build_and_rejects_mid_capture_change (test_dataset.CompatibilityTests.test_hardware_import_preserves_build_and_rejects_mid_capture_change) ... ok
+test_hardware_requires_matching_off_on_binaries (test_dataset.CompatibilityTests.test_hardware_requires_matching_off_on_binaries) ... ok
+test_bad_numbers (test_dataset.DatasetTests.test_bad_numbers) ... ok
+test_cli_roundtrip (test_dataset.DatasetTests.test_cli_roundtrip) ... ok
+test_deterministic_sort (test_dataset.DatasetTests.test_deterministic_sort) ... ok
+test_duplicate_and_cross_record_run (test_dataset.DatasetTests.test_duplicate_and_cross_record_run) ... ok
+test_origins_do_not_escalate (test_dataset.DatasetTests.test_origins_do_not_escalate) ... ok
+test_per_shader_needs_full_identity (test_dataset.DatasetTests.test_per_shader_needs_full_identity) ... ok
+test_schema_and_duplicate_json (test_dataset.DatasetTests.test_schema_and_duplicate_json) ... ok
+test_structural_failures (test_dataset.DatasetTests.test_structural_failures) ... ok
+test_table_never_driver_ready (test_dataset.DatasetTests.test_table_never_driver_ready) ... ok
+test_cli_import_pipeline (test_dataset.ImportTests.test_cli_import_pipeline) ... ok
+test_import_units_and_unknown_features (test_dataset.ImportTests.test_import_units_and_unknown_features) ... ok
+test_reject_incomplete_corrupt_and_origin (test_dataset.ImportTests.test_reject_incomplete_corrupt_and_origin) ... ok
+test_requires_real_expected_binding (test_hardware_collection.PreflightTests.test_requires_real_expected_binding) ... ok
+test_wrong_bdf_is_blocked (test_hardware_collection.PreflightTests.test_wrong_bdf_is_blocked) ... ok
+test_evaluation_does_not_train_tree (test_research.ResearchTests.test_evaluation_does_not_train_tree) ... ok
+test_insufficient_or_mixed_data (test_research.ResearchTests.test_insufficient_or_mixed_data) ... ok
+test_missing_feature_fallback (test_research.ResearchTests.test_missing_feature_fallback) ... ok
+test_mixed_driver_builds_rejected (test_research.ResearchTests.test_mixed_driver_builds_rejected) ... ok
+test_permuted_input (test_research.ResearchTests.test_permuted_input) ... ok
+test_reproducible (test_research.ResearchTests.test_reproducible) ... ok
+test_same_shader_different_layouts_stay_together (test_research.ResearchTests.test_same_shader_different_layouts_stay_together) ... ok
+test_shader_or_scenario_connected_groups (test_research.ResearchTests.test_shader_or_scenario_connected_groups) ... ok
+test_contradictory_same_compile (test_telemetry.TelemetryTests.test_contradictory_same_compile) ... ok
+test_corrupt_records (test_telemetry.TelemetryTests.test_corrupt_records) ... ok
+test_duplicate_and_order (test_telemetry.TelemetryTests.test_duplicate_and_order) ... ok
+test_duplicate_json_fields (test_telemetry.TelemetryTests.test_duplicate_json_fields) ... ok
+test_incomplete_and_truncated (test_telemetry.TelemetryTests.test_incomplete_and_truncated) ... ok
+test_provenance (test_telemetry.TelemetryTests.test_provenance) ... ok
+test_valid_static_only (test_telemetry.TelemetryTests.test_valid_static_only) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 2.485s
+
+OK
