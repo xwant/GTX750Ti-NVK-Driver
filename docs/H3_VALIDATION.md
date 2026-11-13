@@ -68,3 +68,5 @@ The development host rebuilt the four variants incrementally in disposable Mesa 
 During implementation, a generic NIR offset helper was found to count scalar size instead of the explicit 16-byte fixture array stride. The telemetry visitor now walks explicit array/struct offsets; the regression asserts a final byte end of 116 for eight scalar reads at stride 16. Specialization hashing also canonicalizes map order/padding and validates ranges instead of copying the existing native cache hash. These are fixes to the new diagnostic implementation; no new confirmed H2 compiler defect was found.
 
 Hardware handoff: [HARDWARE_VALIDATION.md](HARDWARE_VALIDATION.md).
+
+First hosted CI run exposed a missing explicit `spirv-tools` development dependency in the container recipe; local builds already had it. The recipe now installs it. Artifact paths use a workspace-relative `_build` directory so container and host runner paths cannot diverge. These are CI-environment fixes, not GPU results.
