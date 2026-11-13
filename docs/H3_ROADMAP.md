@@ -7,9 +7,9 @@
 - CPU reference table ABI with compatibility, bounded parsing, content cache identity and fail-closed lookup.
 - Separate H2 tooling audit and regression tests; neither main nor original experiment branches are rewritten.
 
-## Next priority: H3.3 real per-shader capture ABI
+## H3.3 implementation requirements (now implemented below)
 
-Implement an **opt-in diagnostic-only Mesa patch** on clean H2 source: canonical late-NIR hash + full layout semantic digest + specialization/robustness/compiler-policy identity, plus actual static UBO loads, SM50 instructions/GPR/spills/fills/address-op metrics where supported. Explicitly emit unavailable fields as null. Add real NIR/compiler tests proving instrumentation does not alter output, deterministic hashes, and different layout/robustness keys. Do not enable runtime H3 table selection yet.
+The diagnostic work targets an **opt-in diagnostic-only Mesa patch**, applied independently or after H2: canonical late-NIR hash + full layout semantic digest + specialization/robustness/compiler-policy identity, plus actual static UBO loads, SM50 instructions/GPR/spills/fills/address-op metrics where supported. Explicitly emit unavailable fields as null. Add real NIR/compiler tests proving instrumentation does not alter output, deterministic hashes, and different layout/robustness keys. Do not enable runtime H3 table selection yet.
 
 Then: physical GM107 correctness and CTS for H2, audited base/off/on captures with fixed clocks/quality, Dota shader execution/hotness correlation, artifact review. Four synthetic microbenchmark configurations only establish measurement plumbing; they cannot justify a game model. Need many independent shader/layout families and titles/scenes, retaining failing and negative results.
 

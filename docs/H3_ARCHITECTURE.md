@@ -1,6 +1,6 @@
 # H3 architecture and future NVK boundary
 
-Status: offline infrastructure and a **reference contract**. No H3 code is called by NVK. No cloud API, online learning or benchmark runs during rendering. Current game CPU/RAM overhead from H3 is zero because it is not integrated.
+Status: offline decision infrastructure, a **reference contract**, and an opt-in diagnostic Mesa patch. No H3 decision policy is called by NVK. No cloud API, online learning or benchmark runs during rendering. There is no runtime policy lookup or inference. Enabled diagnostics add compile-time traversal, hashing and logging; disabled diagnostics retain a branch check and compile-info metadata. Their CPU overhead has not been measured.
 
 ## Offline path
 
