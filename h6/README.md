@@ -45,7 +45,7 @@ The existing NVIDIA boot is the recovery path; do not modify bootloader, kernel 
 Reference: ArchWiki Nouveau power management documents experimental debugfs reclocking and warns about hangs/overheating. Other projects' Kepler-specific PMU access is not transferable directly to GM107.
 
 
-## Future goal: percentage-based adaptive boost (NOT implemented)
+## Percentage-based adaptive boost (simulation implemented; hardware not implemented)
 
 User experience: display a **requested core-clock multiplier** and measured actual clocks, e.g. 100%, 103%, 106%. The multiplier is defined relative to a clearly recorded stock reference core clock for the same GPU/BIOS and temperature regime, not a multiplier on FPS or a percentage of GPU utilization. A percentage is only a **requested target**, never proof that the hardware attained it.
 
@@ -71,7 +71,7 @@ Do not write kernel parameters, firmware, voltages, fan curves, power limits or 
 ### Implementation milestones
 
 - H6.1: Pure policy simulation (current) choosing conservative existing P-state IDs, with tests.
-- H6.2: Add an **abstract percent-target planning mode** and CPU-only trace-based tests; output recommendations only.
+- H6.2: **Implemented** in `percent.py`: abstract percent-target planning and CPU-only trace tests; recommendations only.
 - H6.3: Separate read-only GM107 telemetry collector and evidence-grade GPU-bottleneck detector, with explicit sensor-quality states.
 - H6.4: Explicitly opted-in *stock P-state* actuator only after supervised hardware acceptance and recovery validation.
 - H6.5: Research *possible* beyond-stock clock control as a separate proposal; do not implement an overclock actuator without proving hardware capability and validating board-specific safeguards.
@@ -90,3 +90,5 @@ python3 h6/percent.py h6/percent-example.jsonl
 ```
 
 Every output includes `applied_to_hardware=false` and `hardware_support_verified=false`. `percent-example.jsonl` is explicitly synthetic. Hardware collection/actuation and real speedups remain NOT RUN. H2/H3 compiler experiments must retain fixed, recorded clock policy; do not combine them with future H6 state changes.
+
+The unified [H2/H3/H6 hardware checklist](https://github.com/xwant/GTX750Ti-NVK-Driver/blob/experiment/h3-shader-telemetry/docs/HARDWARE_VALIDATION.md) remains separate from this simulation branch.
